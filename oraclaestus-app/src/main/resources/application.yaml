@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: oraclaestus
+    version: 0.0.1-DEVEL
+server:
+  port: 8080
+
+
