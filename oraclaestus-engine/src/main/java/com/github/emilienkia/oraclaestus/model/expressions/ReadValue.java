@@ -1,26 +1,29 @@
 package com.github.emilienkia.oraclaestus.model.expressions;
 
-import com.github.emilienkia.oraclaestus.model.Asset;
-import com.github.emilienkia.oraclaestus.model.EvaluationContext;
-import com.github.emilienkia.oraclaestus.model.Model;
-import com.github.emilienkia.oraclaestus.model.State;
-import com.github.emilienkia.oraclaestus.model.types.EnumerationType;
+import com.github.emilienkia.oraclaestus.model.*;
+import lombok.Getter;
 
 public class ReadValue implements Expression {
 
-    private final String valueName;
+    @Getter
+    private final Identifier identifier;
+
+    public ReadValue(Identifier identifier) {
+        this.identifier = identifier;
+    }
 
     public ReadValue(String valueName) {
-        this.valueName = valueName;
+        identifier = Identifier.fromString(valueName);
     }
 
     @Override
     public Object apply(EvaluationContext context) {
-        return context.getValue(valueName);
+        return context.getValue(identifier);
+
     }
 
     @Override
     public void dump() {
-        System.out.print(" <<valueName:" + valueName + ">> ");
+        System.out.print(" <<id:" + identifier + ">> ");
     }
 }

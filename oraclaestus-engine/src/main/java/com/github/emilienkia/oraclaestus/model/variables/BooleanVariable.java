@@ -1,5 +1,6 @@
 package com.github.emilienkia.oraclaestus.model.variables;
 
+import com.github.emilienkia.oraclaestus.model.Identifier;
 import com.github.emilienkia.oraclaestus.model.types.Type;
 
 public class BooleanVariable extends Variable<Boolean> {
@@ -8,6 +9,10 @@ public class BooleanVariable extends Variable<Boolean> {
     }
 
     public BooleanVariable(String name, Boolean defaultValue) {
+        super(Identifier.fromString(name), defaultValue);
+    }
+
+    public BooleanVariable(Identifier name, Boolean defaultValue) {
         super(name, defaultValue);
     }
 

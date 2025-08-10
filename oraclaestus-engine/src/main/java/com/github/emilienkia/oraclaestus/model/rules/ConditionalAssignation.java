@@ -6,22 +6,22 @@ import lombok.Getter;
 
 @Getter
 public class ConditionalAssignation implements Rule {
-    private final String variableName;
+    private final Identifier variableName;
     private final Expression condition;
     private final Expression value;
 
-    public ConditionalAssignation(String field, Expression condition, Expression value) {
+    public ConditionalAssignation(Identifier field, Expression condition, Expression value) {
         this.variableName = field;
         this.condition = condition;
         this.value = value;
     }
 
     @Override
-    public void apply(EvaluationContext context) {
+    public void apply(EvaluationContext context) throws Return {
         Object conditionResult = condition.apply(context);
         if (Helper.toBool(conditionResult)) {
             Object valueResult = value.apply(context);
-            context.getNewState().setValue(variableName, valueResult);
+            context.setValue(variableName, valueResult);
         }
     }
 

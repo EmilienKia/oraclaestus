@@ -1,13 +1,17 @@
 package com.github.emilienkia.oraclaestus.model.expressions;
 
 import com.github.emilienkia.oraclaestus.model.*;
+import lombok.Getter;
 
-public class Ternary implements Expression {
+public class Conditional implements Expression {
+    @Getter
     private final Expression condition;
+    @Getter
     private final Expression trueExpression;
+    @Getter
     private final Expression falseExpression;
 
-    public Ternary(Expression condition, Expression trueExpression, Expression falseExpression) {
+    public Conditional(Expression condition, Expression trueExpression, Expression falseExpression) {
         this.condition = condition;
         this.trueExpression = trueExpression;
         this.falseExpression = falseExpression;

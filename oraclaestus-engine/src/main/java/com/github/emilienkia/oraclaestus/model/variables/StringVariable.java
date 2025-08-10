@@ -1,5 +1,6 @@
 package com.github.emilienkia.oraclaestus.model.variables;
 
+import com.github.emilienkia.oraclaestus.model.Identifier;
 import com.github.emilienkia.oraclaestus.model.types.Type;
 import lombok.Data;
 
@@ -10,6 +11,10 @@ public class StringVariable extends Variable<String> {
     }
 
     public StringVariable(String name, String defaultValue) {
+        super(Identifier.fromString(name), defaultValue);
+    }
+
+    public StringVariable(Identifier name, String defaultValue) {
         super(name, defaultValue);
     }
 

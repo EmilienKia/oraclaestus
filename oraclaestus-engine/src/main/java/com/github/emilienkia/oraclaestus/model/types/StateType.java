@@ -1,8 +1,8 @@
 package com.github.emilienkia.oraclaestus.model.types;
 
-public class EnumerationType extends EnumerableType<EnumerationType.Instance> {
+public class StateType extends EnumerableType<StateType.Instance> {
 
-    public EnumerationType() {
+    public StateType() {
     }
 
     @Override
@@ -31,10 +31,10 @@ public class EnumerationType extends EnumerableType<EnumerationType.Instance> {
 
     @Override
     public Type getType() {
-        return Type.ENUM;
+        return Type.STATE;
     }
 
-    public class Instance extends EnumerableType<EnumerationType.Instance>.Instance {
+    public class Instance extends EnumerableType<StateType.Instance>.Instance {
 
         public Instance() {
         }
@@ -48,8 +48,8 @@ public class EnumerationType extends EnumerableType<EnumerationType.Instance> {
             return super.equals(obj) && obj instanceof Instance instance && instance.value == this.value;
         }
 
-        public EnumerationType getEnumerationType() {
-            return EnumerationType.this;
+        public StateType getStateType() {
+            return StateType.this;
         }
 
     }

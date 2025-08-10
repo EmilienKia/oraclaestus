@@ -23,7 +23,7 @@ public class Condition implements Rule {
     }
 
     @Override
-    public void apply(EvaluationContext context) {
+    public void apply(EvaluationContext context) throws Return {
         Object cond = condition.apply(context);
         if (Helper.toBool(cond)) {
             if(thenRule != null) {

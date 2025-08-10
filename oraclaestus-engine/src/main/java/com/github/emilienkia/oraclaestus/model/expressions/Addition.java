@@ -4,10 +4,13 @@ import com.github.emilienkia.oraclaestus.model.Asset;
 import com.github.emilienkia.oraclaestus.model.EvaluationContext;
 import com.github.emilienkia.oraclaestus.model.Model;
 import com.github.emilienkia.oraclaestus.model.State;
+import lombok.Getter;
 
 public class Addition implements Expression {
 
+    @Getter
     Expression leftExpression;
+    @Getter
     Expression rightExpression;
 
     public Addition(Expression leftExpression, Expression rightExpression) {

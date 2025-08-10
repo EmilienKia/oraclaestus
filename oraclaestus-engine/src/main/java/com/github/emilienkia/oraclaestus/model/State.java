@@ -8,7 +8,7 @@ import java.util.Map;
 @Data
 public class State implements Cloneable{
 
-    Map<String, Object> values = new HashMap<>();
+    Map<Identifier, Object> values = new HashMap<>();
 
     @Override
     public State clone() {
@@ -22,16 +22,20 @@ public class State implements Cloneable{
     }
 
     public Object getValue(String key) {
+        return getValue(Identifier.fromString(key));
+    }
+
+    public Object getValue(Identifier key) {
         return values.get(key);
     }
 
-    public void setValue(String key, Object value) {
+    public void setValue(Identifier key, Object value) {
         values.put(key, value);
     }
 
     public void dump() {
         System.out.println("State dump:");
-        for (Map.Entry<String, Object> entry : values.entrySet()) {
+        for (Map.Entry<Identifier, Object> entry : values.entrySet()) {
             System.out.println("  " + entry.getKey() + ": " + entry.getValue());
         }
     }

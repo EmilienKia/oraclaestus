@@ -1,5 +1,6 @@
 package com.github.emilienkia.oraclaestus.model.variables;
 
+import com.github.emilienkia.oraclaestus.model.Identifier;
 import com.github.emilienkia.oraclaestus.model.types.Type;
 
 public class IntegerVariable extends Variable<Integer> {
@@ -8,6 +9,11 @@ public class IntegerVariable extends Variable<Integer> {
     }
 
     public IntegerVariable(String name, Integer defaultValue) {
+        super(new Identifier(name), defaultValue);
+    }
+
+
+    public IntegerVariable(Identifier name, Integer defaultValue) {
         super(name, defaultValue);
     }
 

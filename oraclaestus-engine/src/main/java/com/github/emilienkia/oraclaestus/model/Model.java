@@ -1,8 +1,10 @@
 package com.github.emilienkia.oraclaestus.model;
 
-import com.github.emilienkia.oraclaestus.model.rules.Rule;
+import com.github.emilienkia.oraclaestus.model.expressions.Expression;
+import com.github.emilienkia.oraclaestus.model.functions.Function;
 import com.github.emilienkia.oraclaestus.model.rules.RuleGroup;
 import com.github.emilienkia.oraclaestus.model.types.EnumerationType;
+import com.github.emilienkia.oraclaestus.model.types.StateType;
 import com.github.emilienkia.oraclaestus.model.variables.Variable;
 import lombok.*;
 
@@ -24,10 +26,19 @@ public class Model {
     Map<String, Object> metadata = new HashMap<>();
 
     @Singular
-    Map<String, Variable<?>> registers = new HashMap<>();
+    Map<Identifier, Variable<?>> registers = new HashMap<>();
+
+    @Singular
+    Map<Identifier, Expression> macros = new HashMap<>();
+
+    @Singular
+    Map<Identifier, Function> functions = new HashMap<>();
 
     @Singular
     List<EnumerationType> enumerations = new ArrayList<>();
+
+    @Singular
+    List<StateType> states = new ArrayList<>();
 
     @Singular
     List<RuleGroup> ruleGroups = new ArrayList<>();
@@ -41,14 +52,50 @@ public class Model {
         asset.setRuleGroups(this.ruleGroups.stream().toList());
 
         State state = new State();
-        state.setValues(registers.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().createDefaultValue())));
-
+        state.setValues(registers.entrySet().stream().collect(HashMap::new, (map, elem) -> map.put(elem.getKey(), elem.getValue().createDefaultValue()), HashMap::putAll));
         asset.setCurrentState(state);
-
         return asset;
     }
 
-    public EnumerationType.Instance getEnumerationValue(String name) {
+
+    public Variable<?> getRegister(String name) {
+        return getRegister(Identifier.fromString(name));
+    }
+
+    public Variable<?> getRegister(Identifier name) {
+        return registers.get(name);
+    }
+
+    public Expression getMacro(String name) {
+        return getMacro(Identifier.fromString(name));
+    }
+
+    public Expression getMacro(Identifier name) {
+        return macros.get(name);
+    }
+
+    public Function getFunction(String name) {
+        return getFunction(Identifier.fromString(name));
+    }
+
+    public Function getFunction(Identifier name) {
+        return functions.get(name);
+    }
+
+
+
+    public StateType.Instance getStateValue(Identifier name) {
+        for (StateType state : states) {
+            Integer value = state.getValue(name);
+            if (value != null) {
+                return state.cast(value);
+            }
+        }
+        return null;
+    }
+
+
+    public EnumerationType.Instance getEnumerationValue(Identifier name) {
         for (EnumerationType enumeration : enumerations) {
             Integer value = enumeration.getValue(name);
             if (value != null) {
@@ -64,8 +111,9 @@ public class Model {
         for(Map.Entry<String, Object> entry : metadata.entrySet()) {
             System.out.println("Metadata: " + entry.getKey() + " = " + entry.getValue());
         }
+        System.out.println("States: (TODO)");
         System.out.println("Registers:");
-        for (Map.Entry<String, Variable<?>> entry : registers.entrySet()) {
+        for (Map.Entry<Identifier, Variable<?>> entry : registers.entrySet()) {
             System.out.println("  " + entry.getKey() + ": " + entry.getValue().getType() + " = " + entry.getValue().createDefaultValue());
         }
         System.out.println("Enumerations: (TODO)");
@@ -74,4 +122,5 @@ public class Model {
             ruleGroup.dump();
         }
     }
+
 }
