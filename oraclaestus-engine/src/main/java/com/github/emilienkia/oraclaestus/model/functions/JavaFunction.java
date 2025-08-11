@@ -17,7 +17,7 @@ public class JavaFunction extends Function {
     Object object;
 
     public JavaFunction(Identifier name, TypeDescriptor<?> returnType, List<Variable<?>> parameters, GenericMethod method, Object object) {
-        super(name, returnType, parameters);
+        super(name, returnType, parameters, false);
         this.method = method;
         this.object = object;
     }

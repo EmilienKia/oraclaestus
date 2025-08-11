@@ -9,6 +9,7 @@ import com.github.emilienkia.oraclaestus.model.rules.Assignation;
 import com.github.emilienkia.oraclaestus.model.expressions.ReadValue;
 import com.github.emilienkia.oraclaestus.model.rules.RuleGroup;
 import com.github.emilienkia.oraclaestus.model.variables.IntegerVariable;
+import nl.altindag.log.LogCaptor;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.Test;
 
@@ -225,6 +226,43 @@ rules {
         assertThat(state.getValue("r3")).isNotNull().isInstanceOf(Integer.class)
                 .asInstanceOf(InstanceOfAssertFactories.INTEGER)
                 .isEqualTo(42);
+
+    }
+
+
+    @Test
+    void testLogModuleFunctionExecution() throws IOException, ExecutionException, InterruptedException {
+
+        String source =
+                """
+                id: "test"
+                rules {
+                    info("This is {} log message {}", 1, 2)
+                    warn("This is warning message !!")
+                }
+                """;
+
+        ModelParserHelper helper = new ModelParserHelper();
+        Model model = helper.parseString(source);
+
+        SimulationRunner simulationRunner = new SimulationRunner();
+        Simulation simulation = new Simulation(LocalDateTime.now(), Duration.ofSeconds(1));
+        simulation.setLoggerPrefix("simulation");
+        simulation.setName("simu");
+        simulation.registerDefaultModules();
+        String id = simulation.addAsset(model.createAsset("test"));
+
+        LogCaptor logCaptor = LogCaptor.forName("simulation.simu." + id);
+
+        SimulationRunner.SimulationSession session = simulationRunner.startSimulation(simulation, 1);
+
+        session.get();
+
+        assertThat(session.getRemainingSteps()).isEqualTo(0);
+
+        assertThat(logCaptor.getInfoLogs()).contains("This is 1 log message 2");
+        assertThat(logCaptor.getWarnLogs()).contains("This is warning message !!");
+
     }
 
 }

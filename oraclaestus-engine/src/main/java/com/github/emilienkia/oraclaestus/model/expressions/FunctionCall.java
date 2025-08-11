@@ -40,6 +40,13 @@ public class FunctionCall implements Expression {
             // Fill missing arguments with default values
             evaluatedArgs.add(func.getParameters().get(i).createDefaultValue());
         }
+        if(func.isVarArgs()) {
+            // If the function is varargs, we can pass the remaining arguments as an array
+            for (; i < arguments.size(); i++) {
+                evaluatedArgs.add(arguments.get(i).apply(context));
+            }
+        }
+
         return func.apply(context, evaluatedArgs);
     }
 

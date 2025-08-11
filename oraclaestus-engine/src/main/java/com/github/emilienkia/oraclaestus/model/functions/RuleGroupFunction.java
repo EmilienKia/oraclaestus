@@ -20,7 +20,7 @@ public class RuleGroupFunction extends Function implements Dumpable {
     RuleGroup ruleGroup;
 
     public RuleGroupFunction(Identifier name, TypeDescriptor<?> returnType, List<Variable<?>> parameters, RuleGroup ruleGroup) {
-        super(name, returnType, parameters);
+        super(name, returnType, parameters, false);
         this.ruleGroup = ruleGroup;
     }
 

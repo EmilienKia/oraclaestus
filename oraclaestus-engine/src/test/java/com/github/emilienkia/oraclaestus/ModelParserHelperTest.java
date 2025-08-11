@@ -478,10 +478,11 @@ rules {
 
         {
             Rule rule = ruleGroup.getRules().get(1);
-            assertThat(rule).isNotNull().isInstanceOf(FunctionCallRule.class);
-            FunctionCallRule functionCallRule = (FunctionCallRule) rule;
+            assertThat(rule).isNotNull().isInstanceOf(ExpressionRule.class);
+            ExpressionRule expressionRule = (ExpressionRule) rule;
 
-            FunctionCall functionCall = functionCallRule.getFunctionCall();
+            assertThat(expressionRule.getExpression()).isNotNull().isInstanceOf(FunctionCall.class);
+            FunctionCall functionCall = (FunctionCall)expressionRule.getExpression();
 
             assertThat(functionCall.getFunctionName()).isEqualTo("add");
             assertThat(functionCall.getArguments()).hasSize(2);

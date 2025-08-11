@@ -2,30 +2,71 @@ package com.github.emilienkia.oraclaestus.model;
 
 import com.github.emilienkia.oraclaestus.model.events.EventListener;
 import com.github.emilienkia.oraclaestus.model.events.StateChangeEvent;
+import com.github.emilienkia.oraclaestus.model.modules.LogModule;
 import com.github.emilienkia.oraclaestus.model.modules.Module;
-import com.github.emilienkia.oraclaestus.model.modules.maths.MathsModule;
+import com.github.emilienkia.oraclaestus.model.modules.MathsModule;
 import com.github.emilienkia.oraclaestus.model.rules.Return;
 import com.github.emilienkia.oraclaestus.model.rules.RuleGroup;
 import com.github.emilienkia.oraclaestus.model.variables.Variable;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.temporal.Temporal;
 import java.util.*;
 
 @Data
+@Slf4j
 public class Simulation {
 
     Temporal time;
     Duration duration;
 
+    String name;
+
     Map<String, Asset> assets = new HashMap<>();
 
     Map<Identifier, Module> modules = new HashMap<>();
 
+    String loggerPrefix;
+    Logger simulationLogger;
+    Map<String, Logger> assetLoggers = new HashMap<>();
+
+
+    public Simulation() {
+        this.time = LocalDateTime.now();
+        this.duration = Duration.ofSeconds(1);
+    }
+
     public Simulation(Temporal time, Duration duration) {
         this.time = time;
         this.duration = duration;
+    }
+
+    public Simulation(Temporal time, Duration duration, String name) {
+        this.time = time;
+        this.duration = duration;
+        setName(name);
+    }
+
+    static int counter = 0;
+    private static String generateName() {
+
+        return String.format("simu-%04x", counter++);
+    }
+
+    public void setName(String name) {
+        this.name = name.replaceAll("[^a-zA-Z0-9_-]", "");
+    }
+
+    public String getName() {
+        if (name == null || name.isBlank()) {
+            return generateName();
+        }
+        return name;
     }
 
     public void addModule(Identifier name, Module module) {
@@ -34,6 +75,7 @@ public class Simulation {
 
     public void registerDefaultModules() {
         addModule(Identifier.fromString("maths"), MathsModule.getModule());
+        addModule(Identifier.fromString("log"), LogModule.getModule());
     }
 
     public String addAsset(Asset asset) {
@@ -50,14 +92,20 @@ public class Simulation {
     }
 
     public void start() {
+        simulationLogger = LoggerFactory.getLogger((loggerPrefix != null && !loggerPrefix.isBlank() ? loggerPrefix : this.getClass().getName()) + "." + getName());
+
         for (Asset asset : assets.values()) {
+            Logger assetLogger = LoggerFactory.getLogger(simulationLogger.getName() + "." + asset.getId());
+            assetLoggers.put(asset.getId(), assetLogger);
+
             State state = new State();
             ModelEvaluationContext context = new ModelEvaluationContext(
                     this,
                     asset.getModel(),
                     asset,
                     state,
-                    state
+                    state,
+                    assetLogger
             );
             for(Map.Entry<Identifier, Variable<?>> entry : asset.getModel().getRegisters().entrySet()) {
                 if(entry.getValue() instanceof Variable<?> variable) {
@@ -86,7 +134,8 @@ public class Simulation {
                     asset.getModel(),
                     asset,
                     asset.getCurrentState(),
-                    asset.getCurrentState().clone()
+                    asset.getCurrentState().clone(),
+                    assetLoggers.get(asset.getId())
             );
 
             // Apply rules to the asset

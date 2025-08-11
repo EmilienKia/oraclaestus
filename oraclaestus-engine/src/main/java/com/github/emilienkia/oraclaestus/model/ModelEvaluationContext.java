@@ -4,12 +4,12 @@ import com.github.emilienkia.oraclaestus.model.expressions.Expression;
 import com.github.emilienkia.oraclaestus.model.functions.Function;
 import com.github.emilienkia.oraclaestus.model.modules.Module;
 import com.github.emilienkia.oraclaestus.model.types.EnumerableType;
-import com.github.emilienkia.oraclaestus.model.types.EnumerationType;
 import com.github.emilienkia.oraclaestus.model.types.StateType;
 import com.github.emilienkia.oraclaestus.model.variables.Variable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.slf4j.Logger;
 
 @Getter
 @NoArgsConstructor
@@ -24,6 +24,8 @@ public class ModelEvaluationContext extends EvaluationContext {
     State oldState;
     State newState;
 
+    Logger logger;
+
     public EnumerableType<?>.Instance getEnumerableValue(Identifier name) {
         if(model!=null) {
             // Look at state values first
@@ -36,10 +38,7 @@ public class ModelEvaluationContext extends EvaluationContext {
 
             // Look at enum values first
             {
-                EnumerationType.Instance value = model.getEnumerationValue(name);
-                if (value != null) {
-                    return value;
-                }
+                return model.getEnumerationValue(name);
             }
         }
         return null;

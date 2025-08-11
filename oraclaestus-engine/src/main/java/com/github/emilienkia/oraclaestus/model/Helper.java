@@ -9,8 +9,7 @@ public class Helper {
             case Integer intVal -> intVal != 0;
             case Float floatVal -> floatVal != 0.0f;
             case String strVal -> !strVal.isEmpty();
-            case null -> false;
-            default -> false;
+            case null, default -> false;
         };
     }
 

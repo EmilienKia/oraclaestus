@@ -71,7 +71,7 @@ public class ModelParserHelper {
         }
 
         if (parser.getNumberOfSyntaxErrors() > 0) {
-            throw new IOException("Parsing errors occurred: " + errorBuilder.toString());
+            throw new IOException("Parsing errors occurred: " + errorBuilder);
         }
 
         return listener.model;
@@ -80,7 +80,6 @@ public class ModelParserHelper {
     static class ModelListener extends ModelBaseListener {
 
         Model model = new Model();
-        State state = new State();
 
         List<Expression> expressions = new ArrayList<>();
 
@@ -100,7 +99,7 @@ public class ModelParserHelper {
 
         class ModelParsingContext implements ParsingContext {
             @Getter
-            List<Rule> rules = new ArrayList();
+            List<Rule> rules = new ArrayList<>();
 
             @Override
             public void addVariable(TypeDescriptor<?> type, Identifier name, Expression initialExpression) {
@@ -141,7 +140,7 @@ public class ModelParserHelper {
 
         static class ConditionalRuleParsingContext implements ParsingContext {
             @Getter
-            List<Rule> rules = new ArrayList();
+            List<Rule> rules = new ArrayList<>();
 
             @Getter @Setter
             Expression ifCondExpression;
@@ -161,7 +160,7 @@ public class ModelParserHelper {
             TypeDescriptor<?> returnType;
 
             @Getter
-            List<Rule> rules = new ArrayList();
+            List<Rule> rules = new ArrayList<>();
 
             @Override
             public void addVariable(TypeDescriptor<?> type, Identifier name, Expression initialExpression) {
@@ -453,13 +452,13 @@ public class ModelParserHelper {
         }
 
         @Override
-        public void exitFunctionCallRule(ModelParser.FunctionCallRuleContext ctx) {
-            FunctionCall call = (FunctionCall) expressions.removeLast();
-            if(call==null) {
+        public void exitExpressionRule(ModelParser.ExpressionRuleContext ctx) {
+            Expression expr = expressions.removeLast();
+            if(expr==null) {
                 // TODO Error handling
-                throw new IllegalArgumentException("Invalid function call: " + ctx.getText());
+                throw new IllegalArgumentException("Invalid expression rule: " + ctx.getText());
             }
-            context.element().addRule(new FunctionCallRule(call));
+            context.element().addRule(new ExpressionRule(expr));
         }
 
         public void exitBinaryExpression(String op,ParserRuleContext ctx) {
@@ -545,14 +544,16 @@ public class ModelParserHelper {
 
         @Override
         public void exitConditionalExpression(ModelParser.ConditionalExpressionContext ctx) {
-            if(expressions.size() >= 3) {
-                Expression third = expressions.removeLast();
-                Expression second = expressions.removeLast();
-                Expression first = expressions.removeLast();
-                if (first == null || second == null || third == null) {
-                    throw new IllegalArgumentException("Invalid conditional expression: " + ctx.getText());
+            if(ctx.cond!=null) {
+                if (expressions.size() >= 3) {
+                    Expression third = expressions.removeLast();
+                    Expression second = expressions.removeLast();
+                    Expression first = expressions.removeLast();
+                    if (first == null || second == null || third == null) {
+                        throw new IllegalArgumentException("Invalid conditional expression: " + ctx.getText());
+                    }
+                    expressions.add(new Conditional(first, second, third));
                 }
-                expressions.add(new Conditional(first, second, third));
             }
         }
 
@@ -587,7 +588,6 @@ public class ModelParserHelper {
 
         @Override
         public void exitValueExpression(ModelParser.ValueExpressionContext ctx) {
-            String text = ctx.getText();
             switch(ctx.value().stop.getType()) {
                 case ModelParser.ID -> {
                     switch(ctx.getText()) {

@@ -39,7 +39,7 @@ rule_decl
     | var_decl              # VariableDeclarationRule
     | rule_name=ID op=('='|'+='|'-='|'*='|'/='|'%=') expression # AssignationRule
     | rule_name=ID '?=' expression ':' expression               # ConditionnalAssignationRule
-    | functionCall          # FunctionCallRule
+    | expression            # ExpressionRule
     ;
 
 condition_rule: 'if' '(' condition=cond_expr ')' rule_group ('else' (condition_rule|rule_group))? # Condition ;
@@ -60,7 +60,7 @@ function_return_type: type #FunctionReturnType;
 expression : conditionalExpression;
 
 conditionalExpression
-    : logicalOrExpression ('?' conditionalExpression ':' conditionalExpression)? // # ConditionalExpression
+    : logicalOrExpression (cond='?' conditionalExpression ':' conditionalExpression)? // # ConditionalExpression
     ;
 
 logicalOrExpression

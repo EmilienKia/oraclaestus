@@ -1,6 +1,4 @@
-package com.github.emilienkia.oraclaestus.model.modules.maths;
-
-import com.github.emilienkia.oraclaestus.model.modules.Module;
+package com.github.emilienkia.oraclaestus.model.modules;
 
 import java.util.random.RandomGenerator;
 
@@ -219,7 +217,7 @@ public class MathsModule extends Module {
     }
 
     private static Float fma(Float a, Float b, Float c) {
-        return (float) Math.fma(a, b, c);
+        return Math.fma(a, b, c);
     }
 
     private static Integer getExponent(Float f) {
@@ -266,7 +264,7 @@ public class MathsModule extends Module {
     }
 
     private static float scalb(Float value, Integer scaleFactor) {
-        return (float) Math.scalb(value, scaleFactor);
+        return Math.scalb(value, scaleFactor);
     }
 
     private static Number max(Number a, Number b) {

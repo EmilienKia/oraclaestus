@@ -42,4 +42,13 @@ public class EvaluationContext {
         }
     }
 
+    public <CTX> CTX getContext(Class<CTX> contextClass) {
+        if (contextClass.isInstance(this)) {
+            return contextClass.cast(this);
+        } else if (parent != null) {
+            return parent.getContext(contextClass);
+        }
+        return null;
+    }
+
 }
