@@ -64,7 +64,7 @@ public class Identifier implements Comparable<Identifier> {
     }
 
     public static Identifier fromString(String identifier) {
-        if (identifier == null || identifier.isEmpty()) {
+        if (identifier == null || identifier.isBlank()) {
             return new Identifier();
         }
         String[] parts = identifier.split("\\.");

@@ -6,15 +6,17 @@ import com.github.emilienkia.oraclaestus.model.Identifier;
 import com.github.emilienkia.oraclaestus.model.types.TypeDescriptor;
 import com.github.emilienkia.oraclaestus.model.variables.*;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class JavaFunction extends Function {
 
-    Method method;
+    GenericMethod method;
     Object object;
 
-    public JavaFunction(Identifier name, TypeDescriptor<?> returnType, List<Variable<?>> parameters, Method method, Object object) {
+    public JavaFunction(Identifier name, TypeDescriptor<?> returnType, List<Variable<?>> parameters, GenericMethod method, Object object) {
         super(name, returnType, parameters);
         this.method = method;
         this.object = object;
@@ -28,12 +30,12 @@ public class JavaFunction extends Function {
             // TODO Check and cast return type
             return result;
         } else {
-            throw new IllegalStateException("Method is not defined for this JavaFunction");
+            throw new IllegalStateException("Method is not defined for this JavaFunction : " + getName());
         }
     }
 
     @FunctionalInterface
-    public interface Method {
+    public interface GenericMethod {
         Object invoke(EvaluationContext context, List<Object> arguments);
     }
 
@@ -42,11 +44,47 @@ public class JavaFunction extends Function {
         return new Builder();
     }
 
+    public static Builder builder(Class<?> clazz, String methodName, Class<?>... parameterTypes) throws NoSuchMethodException {
+        if(clazz == null || methodName == null || methodName.isBlank()) {
+            throw new IllegalArgumentException("Class and method name cannot be null or empty");
+        }
+        return builder(clazz.getMethod(methodName, parameterTypes));
+    }
+
+    public static Builder builder(Method method) {
+        if(method == null) {
+            throw new IllegalArgumentException("Method cannot be null");
+        }
+
+        Builder builder = new Builder()
+                .name(method.getName())
+                .returnType(method.getReturnType());
+
+        int paramCount = 0;
+        for(Class<?> paramType : method.getParameterTypes()) {
+            builder.parameter("param" + paramCount++, paramType, null);
+        }
+
+        builder.method((context, arguments) -> {
+            try {
+                Object[] params = new Object[arguments.size()];
+                for (int i = 0; i < arguments.size(); i++) {
+                    params[i] = Helper.toTypeDescriptor(method.getParameterTypes()[i]).cast(arguments.get(i));
+                }
+                return method.invoke(builder.object, params);
+            } catch (Exception e) {
+                throw new RuntimeException("Error invoking method " + method.getName(), e);
+            }
+        });
+
+        return builder;
+    }
+
     public static class Builder {
         private Identifier name;
         private TypeDescriptor<?> returnType;
         private List<Variable<?>> parameters = new ArrayList<>();
-        private Method method;
+        private GenericMethod method;
         private Object object = null;
 
         public Builder name(String name) {
@@ -82,34 +120,17 @@ public class JavaFunction extends Function {
             return this;
         }
 
+        public Builder parameters(Variable<?> ... parameters) {
+            this.parameters = Arrays.asList(parameters);
+            return this;
+        }
+
         public Builder parameters(List<Variable<?>> parameters) {
             this.parameters = parameters;
             return this;
         }
 
-/*        public Builder method(Method method) {
-            this.method = method;
-
-            if(name == null || !name.isValid()) {
-                name = Identifier.fromString(method.getName());
-            }
-
-            if(returnType == null) {
-                returnType = Helper.toTypeDescriptor(method.getReturnType());
-            }
-
-            if(parameters == null || parameters.isEmpty()) {
-                if(parameters == null) {
-                    parameters = new java.util.ArrayList<>();
-                }
-                for(Class<?> paramType : method.getParameterTypes()) {
-                    parameters.add(new GenericVariable(Helper.toTypeDescriptor(paramType), Identifier.fromString("param" + parameters.size()), null));
-                }
-            }
-            return this;
-        }*/
-
-        public Builder method(Method method) {
+        public Builder method(GenericMethod method) {
             this.method = method;
             return this;
         }
@@ -128,6 +149,17 @@ public class JavaFunction extends Function {
             variable.setName(Identifier.fromString(name));
             return this;
         }
+
+        public Builder parameterNames(String ... names) {
+            if(names.length != parameters.size()) {
+                throw new IllegalArgumentException("Number of names must match number of parameters");
+            }
+            for (int i = 0; i < names.length; i++) {
+                parameterName(i, names[i]);
+            }
+            return this;
+        }
+
 
         public Builder parameterNames(List<String> names) {
             if(names.size() != parameters.size()) {

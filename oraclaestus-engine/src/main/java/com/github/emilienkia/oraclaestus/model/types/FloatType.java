@@ -1,6 +1,6 @@
 package com.github.emilienkia.oraclaestus.model.types;
 
-public class FloatType implements TypeDescriptor<Float> {
+public class FloatType extends NumberType<Float> {
 
     @Override
     public Float cast(Object value) {

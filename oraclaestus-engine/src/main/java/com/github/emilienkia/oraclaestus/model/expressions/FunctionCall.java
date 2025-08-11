@@ -2,7 +2,6 @@ package com.github.emilienkia.oraclaestus.model.expressions;
 
 import com.github.emilienkia.oraclaestus.model.EvaluationContext;
 import com.github.emilienkia.oraclaestus.model.functions.Function;
-import com.github.emilienkia.oraclaestus.model.functions.RuleGroupFunction;
 import com.github.emilienkia.oraclaestus.model.Identifier;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

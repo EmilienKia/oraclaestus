@@ -177,12 +177,16 @@ rules {
                     f : float
                     g: float
                     r: float
+                    r2 : int
+                    r3 : int
                 }
                 
                 rules {
                     f = cos(pi / 2)
                     g = cos(pi)
-                    r = rand(0.0, 100.0)
+                    r = rand(50.0, 100.0)
+                    r2 = rand(50, 100)
+                    r3 = abs(-42)
                 }
                 """;
 
@@ -210,8 +214,17 @@ rules {
 
         assertThat(state.getValue("r")).isNotNull().isInstanceOf(Float.class)
                 .asInstanceOf(InstanceOfAssertFactories.FLOAT)
-                .isGreaterThanOrEqualTo(0.0f)
+                .isGreaterThanOrEqualTo(50.0f)
                 .isLessThanOrEqualTo(100.0f);
+
+        assertThat(state.getValue("r2")).isNotNull().isInstanceOf(Integer.class)
+                .asInstanceOf(InstanceOfAssertFactories.INTEGER)
+                .isGreaterThanOrEqualTo(50)
+                .isLessThanOrEqualTo(100);
+
+        assertThat(state.getValue("r3")).isNotNull().isInstanceOf(Integer.class)
+                .asInstanceOf(InstanceOfAssertFactories.INTEGER)
+                .isEqualTo(42);
     }
 
 }

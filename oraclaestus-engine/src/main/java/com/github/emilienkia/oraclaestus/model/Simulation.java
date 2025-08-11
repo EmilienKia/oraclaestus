@@ -33,7 +33,7 @@ public class Simulation {
     }
 
     public void registerDefaultModules() {
-        addModule(Identifier.fromString("maths"), new MathsModule());
+        addModule(Identifier.fromString("maths"), MathsModule.getModule());
     }
 
     public String addAsset(Asset asset) {

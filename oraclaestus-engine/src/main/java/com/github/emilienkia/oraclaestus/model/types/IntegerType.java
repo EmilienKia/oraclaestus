@@ -1,6 +1,6 @@
 package com.github.emilienkia.oraclaestus.model.types;
 
-public class IntegerType implements TypeDescriptor<Integer> {
+public class IntegerType extends NumberType<Integer> {
 
     @Override
     public Integer cast(Object value) {

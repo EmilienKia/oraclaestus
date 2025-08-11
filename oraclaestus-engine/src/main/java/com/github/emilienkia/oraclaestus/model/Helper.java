@@ -19,6 +19,8 @@ public class Helper {
             return new IntegerType();
         } else if (clazz == Float.class || clazz == float.class || clazz == Double.class || clazz == double.class) {
             return new FloatType();
+        } else if (clazz == Number.class) {
+            return new NumberType<>();
         } else if (clazz == String.class) {
             return new StringType();
         } else if (clazz == Boolean.class || clazz == boolean.class) {
