@@ -1,7 +1,9 @@
 package com.github.emilienkia.oraclaestus.model.variables;
 
 import com.github.emilienkia.oraclaestus.model.Identifier;
+import com.github.emilienkia.oraclaestus.model.types.StringType;
 import com.github.emilienkia.oraclaestus.model.types.Type;
+import com.github.emilienkia.oraclaestus.model.types.TypeDescriptor;
 import lombok.Data;
 
 @Data
@@ -21,6 +23,10 @@ public class StringVariable extends Variable<String> {
     @Override
     public Type getType() {
         return Type.STRING;
+    }
+
+    public TypeDescriptor<String> getTypeDescriptor() {
+        return new StringType();
     }
 
 }

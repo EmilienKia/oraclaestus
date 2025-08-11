@@ -69,8 +69,9 @@ public class RuleGroup implements Rule {
         }
 
         public void setValue(Identifier name, Object value) {
-            if (values.containsKey(name)) {
-                values.put(name, value);
+            Variable<?> variable = variables.get(name);
+            if (variable!=null) {
+                values.put(name, variable.getTypeDescriptor().cast(value));
             } else {
                 super.setValue(name, value);
             }

@@ -2,7 +2,9 @@ package com.github.emilienkia.oraclaestus.model.variables;
 
 import com.github.emilienkia.oraclaestus.model.Identifier;
 import com.github.emilienkia.oraclaestus.model.types.StateType;
+import com.github.emilienkia.oraclaestus.model.types.StringType;
 import com.github.emilienkia.oraclaestus.model.types.Type;
+import com.github.emilienkia.oraclaestus.model.types.TypeDescriptor;
 
 public class StateVariable extends Variable<StateType.Instance> {
 
@@ -20,6 +22,10 @@ public class StateVariable extends Variable<StateType.Instance> {
     @Override
     public Type getType() {
         return Type.STATE;
+    }
+
+    public TypeDescriptor<StateType.Instance> getTypeDescriptor() {
+        return new StateType();
     }
 
 }

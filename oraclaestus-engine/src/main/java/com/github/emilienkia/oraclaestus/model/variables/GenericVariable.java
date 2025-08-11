@@ -2,6 +2,7 @@ package com.github.emilienkia.oraclaestus.model.variables;
 
 import com.github.emilienkia.oraclaestus.model.Identifier;
 import com.github.emilienkia.oraclaestus.model.expressions.Expression;
+import com.github.emilienkia.oraclaestus.model.types.IntegerType;
 import com.github.emilienkia.oraclaestus.model.types.Type;
 import com.github.emilienkia.oraclaestus.model.types.TypeDescriptor;
 
@@ -27,4 +28,7 @@ public class GenericVariable extends Variable<Object> {
         return type.getType();
     }
 
+    public TypeDescriptor<Object> getTypeDescriptor() {
+        return (TypeDescriptor<Object>)type;
+    }
 }

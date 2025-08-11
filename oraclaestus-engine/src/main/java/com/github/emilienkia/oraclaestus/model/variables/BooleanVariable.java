@@ -1,7 +1,10 @@
 package com.github.emilienkia.oraclaestus.model.variables;
 
 import com.github.emilienkia.oraclaestus.model.Identifier;
+import com.github.emilienkia.oraclaestus.model.types.BooleanType;
+import com.github.emilienkia.oraclaestus.model.types.EnumerationType;
 import com.github.emilienkia.oraclaestus.model.types.Type;
+import com.github.emilienkia.oraclaestus.model.types.TypeDescriptor;
 
 public class BooleanVariable extends Variable<Boolean> {
 
@@ -19,5 +22,9 @@ public class BooleanVariable extends Variable<Boolean> {
     @Override
     public Type getType() {
         return Type.BOOLEAN;
+    }
+
+    public TypeDescriptor<Boolean> getTypeDescriptor() {
+        return new BooleanType();
     }
 }

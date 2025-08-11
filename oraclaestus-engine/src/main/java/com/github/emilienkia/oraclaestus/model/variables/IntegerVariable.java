@@ -1,7 +1,10 @@
 package com.github.emilienkia.oraclaestus.model.variables;
 
 import com.github.emilienkia.oraclaestus.model.Identifier;
+import com.github.emilienkia.oraclaestus.model.types.IntegerType;
+import com.github.emilienkia.oraclaestus.model.types.StateType;
 import com.github.emilienkia.oraclaestus.model.types.Type;
+import com.github.emilienkia.oraclaestus.model.types.TypeDescriptor;
 
 public class IntegerVariable extends Variable<Integer> {
 
@@ -22,4 +25,7 @@ public class IntegerVariable extends Variable<Integer> {
         return Type.INTEGER;
     }
 
+    public TypeDescriptor<Integer> getTypeDescriptor() {
+        return new IntegerType();
+    }
 }

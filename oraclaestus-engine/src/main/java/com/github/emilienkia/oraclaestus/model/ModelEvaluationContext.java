@@ -6,6 +6,7 @@ import com.github.emilienkia.oraclaestus.model.modules.Module;
 import com.github.emilienkia.oraclaestus.model.types.EnumerableType;
 import com.github.emilienkia.oraclaestus.model.types.EnumerationType;
 import com.github.emilienkia.oraclaestus.model.types.StateType;
+import com.github.emilienkia.oraclaestus.model.variables.Variable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -94,11 +95,11 @@ public class ModelEvaluationContext extends EvaluationContext {
     }
 
     public void setValue(Identifier name, Object value) {
-        if(!model.getRegisters().containsKey(name)) {
+        Variable<?> register = model.getRegister(name);
+        if(register==null) {
             throw  new RuntimeException("Model does not contain register: " + name);
         }
-        // TODO Check type compatibility or cast the value
-        newState.setValue(name, value);
+        newState.setValue(name, register.getTypeDescriptor().cast(value));
     }
 
 }

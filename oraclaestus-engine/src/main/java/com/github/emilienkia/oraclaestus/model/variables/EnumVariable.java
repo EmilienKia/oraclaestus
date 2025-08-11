@@ -2,7 +2,9 @@ package com.github.emilienkia.oraclaestus.model.variables;
 
 import com.github.emilienkia.oraclaestus.model.Identifier;
 import com.github.emilienkia.oraclaestus.model.types.EnumerationType;
+import com.github.emilienkia.oraclaestus.model.types.FloatType;
 import com.github.emilienkia.oraclaestus.model.types.Type;
+import com.github.emilienkia.oraclaestus.model.types.TypeDescriptor;
 
 public class EnumVariable  extends Variable<EnumerationType.Instance> {
 
@@ -22,4 +24,7 @@ public class EnumVariable  extends Variable<EnumerationType.Instance> {
         return Type.ENUM;
     }
 
+    public TypeDescriptor<EnumerationType.Instance> getTypeDescriptor() {
+        return new EnumerationType();
+    }
 }

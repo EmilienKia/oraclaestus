@@ -47,7 +47,7 @@ public class RuleGroupFunction extends Function implements Dumpable {
         void initialize(List<Object> arguments) {
             for(int i = 0; i < parameters.size(); i++) {
                 Variable<?> param = parameters.get(i);
-                values.put(param.getName(), i < arguments.size() ? arguments.get(i) : param.createDefaultValue());
+                values.put(param.getName(), i < arguments.size() ? param.getTypeDescriptor().cast(arguments.get(i)) : param.createDefaultValue());
             }
         }
 
@@ -60,8 +60,9 @@ public class RuleGroupFunction extends Function implements Dumpable {
         }
 
         public void setValue(Identifier name, Object value) {
-            if(values.containsKey(name)) {
-                values.put(name, value);
+            Variable<?> register = parameters.stream().filter(p -> p.getName().equals(name)).findFirst().orElse(null);
+            if(register!=null) {
+                values.put(name, register.getTypeDescriptor().cast(value));
             } else {
                 super.setValue(name, value);
             }

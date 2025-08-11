@@ -1,13 +1,6 @@
 package com.github.emilienkia.oraclaestus.model.modules.maths;
 
-import com.github.emilienkia.oraclaestus.model.Helper;
-import com.github.emilienkia.oraclaestus.model.Identifier;
-import com.github.emilienkia.oraclaestus.model.functions.JavaFunction;
 import com.github.emilienkia.oraclaestus.model.modules.Module;
-import com.github.emilienkia.oraclaestus.model.variables.FloatVariable;
-import com.github.emilienkia.oraclaestus.model.variables.GenericVariable;
-
-import java.util.function.Function;
 
 public class MathsModule extends Module {
 

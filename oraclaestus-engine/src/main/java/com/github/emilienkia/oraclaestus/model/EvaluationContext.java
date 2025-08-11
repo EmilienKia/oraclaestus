@@ -1,7 +1,6 @@
 package com.github.emilienkia.oraclaestus.model;
 
 import com.github.emilienkia.oraclaestus.model.functions.Function;
-import com.github.emilienkia.oraclaestus.model.functions.RuleGroupFunction;
 import com.github.emilienkia.oraclaestus.model.types.EnumerableType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
