@@ -6,7 +6,6 @@ import com.github.emilienkia.oraclaestus.grammars.ModelParser;
 import com.github.emilienkia.oraclaestus.model.functions.RuleGroupFunction;
 import com.github.emilienkia.oraclaestus.model.Identifier;
 import com.github.emilienkia.oraclaestus.model.Model;
-import com.github.emilienkia.oraclaestus.model.State;
 import com.github.emilienkia.oraclaestus.model.expressions.*;
 import com.github.emilienkia.oraclaestus.model.expressions.FunctionCall;
 import com.github.emilienkia.oraclaestus.model.rules.*;

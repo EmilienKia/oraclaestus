@@ -23,8 +23,9 @@
     </properties>
 
     <modules>
-        <module>oraclaestus-engine</module>
-        <module>oraclaestus-app</module>
+        <module>engine</module>
+        <module>app</module>
+        <module>examples</module>
     </modules>
 
     <dependencies>

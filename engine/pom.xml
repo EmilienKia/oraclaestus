@@ -11,7 +11,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>oraclaestus-engine</artifactId>
+    <artifactId>engine</artifactId>
 
     <name>Oraclaestus device simulator engine</name>
     <description>Device simulator</description>
