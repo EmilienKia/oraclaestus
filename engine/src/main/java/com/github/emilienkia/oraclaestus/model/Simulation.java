@@ -35,7 +35,6 @@ public class Simulation {
     Logger simulationLogger;
     Map<String, Logger> assetLoggers = new HashMap<>();
 
-
     public Simulation() {
         this.time = LocalDateTime.now();
         this.duration = Duration.ofSeconds(1);

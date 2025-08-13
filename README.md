@@ -138,6 +138,7 @@ Object value = state.getValue("anyRegisterName");
 
 ## Documentation
 
+For more information, detailed documentation is available in [docs directory](docs/index.md).
 
 
 ## License

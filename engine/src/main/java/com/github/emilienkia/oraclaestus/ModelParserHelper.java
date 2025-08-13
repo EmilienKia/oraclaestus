@@ -305,7 +305,6 @@ public class ModelParserHelper {
             type = null;
         }
 
-
         @Override
         public void exitRules(ModelParser.RulesContext ctx) {
             ModelParsingContext modelContext = (ModelParsingContext) context.element();

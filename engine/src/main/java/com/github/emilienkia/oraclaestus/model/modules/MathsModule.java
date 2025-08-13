@@ -17,7 +17,7 @@ public class MathsModule extends Module {
 
     private MathsModule() {
 
-        addNumberToNumberFunction("abs", "number", MathsModule::abs);
+        addNumberToNumberFunction("abs", "value", MathsModule::abs);
 
         add2NumbersToNumbersFunction("rand", "min", "max", MathsModule::rand);
         add2FloatsToFloatFunction("randGaussian", "mean", "stdev", MathsModule::randGaussian);
@@ -33,16 +33,14 @@ public class MathsModule extends Module {
         addFloatToFloatFunction("atan", "value", MathsModule::atan);
         add2FloatsToFloatFunction("atan2", "y", "x", MathsModule::atan2);
         add2FloatsToFloatFunction("hypot", "y", "x", MathsModule::hypot);
-        addFloatToFloatFunction("toDegrees", "value", MathsModule::toDegrees);
-        addFloatToFloatFunction("toRadians", "value", MathsModule::toRadians);
+        addFloatToFloatFunction("toDegrees", "angle", MathsModule::toDegrees);
+        addFloatToFloatFunction("toRadians", "angle", MathsModule::toRadians);
 
         addFloatToFloatFunction("ceil", "value", MathsModule::ceil);
         add2IntegersToIntegerFunction("ceilDiv", "dividend", null, "divisor", 1, MathsModule::ceilDiv);
-        add2IntegersToIntegerFunction("ceilDivExact", "dividend", null, "divisor", 1, MathsModule::ceilDivExact);
         add2IntegersToIntegerFunction("ceilMod", "dividend", null, "divisor", 1, MathsModule::ceilMod);
         addFloatToFloatFunction("floor", "value", MathsModule::floor);
         add2IntegersToIntegerFunction("floorDiv", "dividend", null, "divisor", 1, MathsModule::floorDiv);
-        add2IntegersToIntegerFunction("floorDivExact", "dividend", null, "divisor", 1, MathsModule::floorDivExact);
         add2IntegersToIntegerFunction("floorMod", "dividend", null, "divisor", 1, MathsModule::floorMod);
         add3NumbersToNumbersFunction("clamp", "value", "min", "max", MathsModule::clamp);
         add3FloatsToFloatFunction("fma", "a", "b", "c", MathsModule::fma);
@@ -167,13 +165,6 @@ public class MathsModule extends Module {
         return Math.ceilDiv(dividend, divisor);
     }
 
-    private static Integer ceilDivExact(Integer dividend, Integer divisor) {
-        if (divisor == 0) {
-            throw new ArithmeticException("Division by zero");
-        }
-        return Math.ceilDivExact(dividend, divisor);
-    }
-
     private static Integer ceilMod(Integer dividend, Integer divisor) {
         if (divisor == 0) {
             throw new ArithmeticException("Division by zero");
@@ -185,19 +176,11 @@ public class MathsModule extends Module {
         return (float) Math.floor(value);
     }
 
-
     private static Integer floorDiv(Integer dividend, Integer divisor) {
         if (divisor == 0) {
             throw new ArithmeticException("Division by zero");
         }
         return Math.floorDiv(dividend, divisor);
-    }
-
-    private static Integer floorDivExact(Integer dividend, Integer divisor) {
-        if (divisor == 0) {
-            throw new ArithmeticException("Division by zero");
-        }
-        return Math.floorDivExact(dividend, divisor);
     }
 
     private static Integer floorMod(Integer dividend, Integer divisor) {

@@ -33,6 +33,7 @@ registers {
 
 rules {
     s : int = rand(1, step)
+    info("Current value: {} , {}", current, s)
     if(grow) {
         current += s
         if(current >= max) {
