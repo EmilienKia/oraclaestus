@@ -9,7 +9,7 @@ metadata
     ;
 
 metadata_line
-    : metadata_name=ID (':' metadata_value=value_or_id)? # MetadataDeclaration
+    : metadata_name=ID (':' metadata_value)? # MetadataDeclaration
     ;
 
 registers
@@ -37,8 +37,8 @@ rule_decl
     | 'return' expression?  # ReturnRule
     | rule_group            # RuleGroupRule
     | var_decl              # VariableDeclarationRule
-    | rule_name=ID op=('='|'+='|'-='|'*='|'/='|'%=') expression # AssignationRule
-    | rule_name=ID '?=' expression ':' expression               # ConditionnalAssignationRule
+    | rule_name=identifier op=('='|'+='|'-='|'*='|'/='|'%=') expression # AssignationRule
+    | rule_name=identifier '?=' expression ':' expression               # ConditionnalAssignationRule
     | expression            # ExpressionRule
     ;
 
@@ -100,14 +100,9 @@ primaryExpression
     : '(' expression ')'    # ParenthesizedExpression
     | functionCall          # FunctionCallExpression
     | value                 # ValueExpression
-    | identifier            # VariableReferenceExpression
     ;
 
 functionCall : func_name=identifier '(' param_value+=expression (',' param_value+=expression)* ')';
-
-identifier
-    : var_name+=ID ('.' var_name+=ID)* # VariableIdentifier
-    ;
 
 type
     : 'int'             # IntegerType
@@ -118,18 +113,20 @@ type
     | 'state' '{' enum_value+=ID (',' enum_value+=ID)* '}'   # StateType
     ;
 
-value_or_id : value | ID ;
-
 value
-    : BOOLEAN
-    | STRING
-    | NUMBER
+    : BOOLEAN               # BooleanValue
+    | STRING                # StringValue
+    | NUMBER                # NumberValue
+    | old='~'? identifier   # IdentifierValue
     ;
 
+metadata_value : BOOLEAN | STRING | NUMBER | ID ;
 
-ID : [~]?[a-zA-Z_][a-zA-Z0-9_]* ;
+identifier : ID ('.' ID)* ;
 
-STRING : ('"' (~["\r\n])* '"') ;
+ID : [a-zA-Z_][a-zA-Z0-9_]* ;
+
+STRING : '"' (~["\r\n])* '"' ;
 
 NUMBER : [0-9]+ ('.' [0-9]+)? ;
 

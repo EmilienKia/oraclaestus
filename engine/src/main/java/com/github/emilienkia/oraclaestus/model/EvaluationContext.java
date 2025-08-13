@@ -28,9 +28,9 @@ public class EvaluationContext {
             return null;
         }
     }
-    public Object getValue(Identifier name) {
+    public Object getValue(Identifier name, boolean old) {
         if(parent != null) {
-            return parent.getValue(name);
+            return parent.getValue(name, old);
         } else {
             return null;
         }

@@ -84,8 +84,6 @@ public class ModelParserHelper {
 
         TypeDescriptor<?> type = null;
 
-        List<Identifier> identifiers = new ArrayList<>();
-
         interface ParsingContext {
             default void addVariable(TypeDescriptor<?> type, Identifier name, Expression initialExpression) {}
             default void addVariable(TypeDescriptor<?> type, Identifier name, Object initialValue) {}
@@ -187,14 +185,13 @@ public class ModelParserHelper {
         @Override
         public void exitMetadataDeclaration(ModelParser.MetadataDeclarationContext ctx) {
             String key = ctx.metadata_name.getText();
-            Object value = switch(ctx.metadata_value.stop.getType()) {
-                case ModelParser.ID -> ctx.metadata_value.getText(); // TODO handle also booleans ?
-                case ModelParser.STRING -> ctx.metadata_value.getText().substring(1, ctx.metadata_value.getText().length() - 1); // Remove quotes
-                case ModelParser.NUMBER -> Float.parseFloat(ctx.metadata_value.getText());
-                case ModelParser.BOOLEAN -> Boolean.parseBoolean(ctx.metadata_value.getText());
+            Object value = switch(ctx.metadata_value().stop.getType()) {
+                case ModelParser.ID -> ctx.metadata_value().getText(); // TODO handle also booleans ?
+                case ModelParser.STRING -> ctx.metadata_value().getText().substring(1, ctx.metadata_value().getText().length() - 1); // Remove quotes
+                case ModelParser.NUMBER -> Float.parseFloat(ctx.metadata_value().getText());
+                case ModelParser.BOOLEAN -> Boolean.parseBoolean(ctx.metadata_value().getText());
                 default -> null;
             };
-
             switch(key) {
                 case "name" -> model.setName(value!=null ? value.toString() : "");
                 case "id" -> model.setId(value!=null ? value.toString() : "");
@@ -204,11 +201,7 @@ public class ModelParserHelper {
 
         @Override
         public void exitVariableDeclaration(ModelParser.VariableDeclarationContext ctx) {
-            if(identifiers.isEmpty()) {
-                // TODO Error handling
-                throw new IllegalArgumentException("Variable name cannot be null or empty");
-            }
-            Identifier varName = identifiers.removeLast();
+            Identifier varName = Identifier.fromString(ctx.var_name.getText());
             if(varName == null || !varName.isValid()) {
                 // TODO Error handling
                 throw new IllegalArgumentException("Variable name cannot be null or empty");
@@ -239,11 +232,7 @@ public class ModelParserHelper {
 
         @Override
         public void exitMacroDeclaration(ModelParser.MacroDeclarationContext ctx) {
-            if(identifiers.isEmpty()) {
-                // TODO Error handling
-                throw new IllegalArgumentException("Macro name cannot be null or empty");
-            }
-            Identifier macroName = identifiers.removeLast();
+            Identifier macroName = Identifier.fromString(ctx.macro_name.getText());
             if(macroName == null || !macroName.isValid()) {
                 // TODO Error handling
                 throw new IllegalArgumentException("Macro name cannot be null or empty");
@@ -270,17 +259,14 @@ public class ModelParserHelper {
                 // TODO Error handling
                 throw new IllegalArgumentException("Invalid function context: " + ctx.getText());
             }
-            if(identifiers.isEmpty()) {
-                // TODO Error handling
-                throw new IllegalArgumentException("Function name cannot be null or empty");
-            }
-            Identifier functionName = identifiers.removeLast();
-            if(functionName == null || !functionName.isValid()) {
+
+            Identifier functionName = Identifier.fromString(ctx.func_name.getText());
+            if(/*functionName == null || */!functionName.isValid()) {
                 // TODO Error handling
                 throw new IllegalArgumentException("Function name cannot be null or empty");
             }
 
-            if(functionContext.getRules().isEmpty() || !(functionContext.getRules().get(0) instanceof RuleGroup ruleGroup)) {
+            if(functionContext.getRules().isEmpty() || !(functionContext.getRules().getFirst() instanceof RuleGroup ruleGroup)) {
                 // TODO Error handling
                 throw new IllegalArgumentException("Function must have exactly one rule");
             }
@@ -399,10 +385,6 @@ public class ModelParserHelper {
             if(variableName == null || opName == null || !variableName.isValid() || opName.isEmpty()) {
                 // TODO
                 throw new IllegalArgumentException("Invalid expression in rule: " + ctx.getText());
-            }
-            if(variableName.isOld()) {
-                // TODO
-                throw new IllegalArgumentException("Variable to assign cannot be an old-state variable name: " + variableName);
             }
 
             context.element().addRule(new Assignation(variableName, switch(opName) {
@@ -567,11 +549,7 @@ public class ModelParserHelper {
 
         @Override
         public void exitFunctionCall(ModelParser.FunctionCallContext ctx) {
-            if(identifiers.isEmpty()) {
-                // TODO Error handling
-                throw new IllegalArgumentException("Function name cannot be null or empty");
-            }
-            Identifier functionName = identifiers.removeLast();
+            Identifier functionName = Identifier.fromString(ctx.func_name.getText());
             if(functionName == null || !functionName.isValid()) {
                 // TODO Error handling
                 throw new IllegalArgumentException("Function name cannot be null or empty");
@@ -583,45 +561,28 @@ public class ModelParserHelper {
             expressions.add(new FunctionCall(functionName, args));
         }
 
-
         @Override
-        public void exitValueExpression(ModelParser.ValueExpressionContext ctx) {
-            switch(ctx.value().stop.getType()) {
-                case ModelParser.ID -> {
-                    switch(ctx.getText()) {
-                        case "true", "false" -> expressions.add(new ConstValue(ConstValue.parseBoolean(ctx.getText())));
-                        // TODO Look at enum or state values
-                        default              -> expressions.add(new ReadValue(ctx.getText()));
-                    }
-                }
-                case ModelParser.STRING ->  expressions.add(new ConstValue(ConstValue.parseString(ctx.getText())));
-                case ModelParser.NUMBER -> expressions.add(new ConstValue(ConstValue.parseNumber(ctx.getText())));
-                case ModelParser.BOOLEAN -> expressions.add(new ConstValue(ConstValue.parseBoolean(ctx.getText())));
-            }
-        }
-
-
-        @Override
-        public void exitVariableReferenceExpression(ModelParser.VariableReferenceExpressionContext ctx) {
-            if(identifiers.isEmpty()) {
-                // TODO Error handling
-                throw new IllegalArgumentException("Invalid variable reference: " + ctx.getText());
-            }
-            Identifier id = identifiers.removeLast();
-            if(id == null || !id.isValid()) {
-                // TODO Error handling
-                throw new IllegalArgumentException("Invalid variable identifier: " + ctx.getText());
-            }
-            if(id.toString().equals("true") || id.toString().equals("false")) {
-                expressions.add(new ConstValue(Boolean.parseBoolean(id.toString())));
-            } else {
-                expressions.add(new ReadValue(id));
-            }
+        public void exitBooleanValue(ModelParser.BooleanValueContext ctx) {
+            expressions.add(new ConstValue(ConstValue.parseBoolean(ctx.getText())));
         }
 
         @Override
-        public void exitVariableIdentifier(ModelParser.VariableIdentifierContext ctx) {
-            identifiers.add(new Identifier(ctx.var_name.stream().map(Token::getText).toList()));
+        public void exitStringValue(ModelParser.StringValueContext ctx) {
+            expressions.add(new ConstValue(ConstValue.parseString(ctx.getText())));
+        }
+
+        @Override
+        public void exitNumberValue(ModelParser.NumberValueContext ctx) {
+            expressions.add(new ConstValue(ConstValue.parseNumber(ctx.getText())));
+        }
+
+        @Override
+        public void exitIdentifierValue(ModelParser.IdentifierValueContext ctx) {
+            switch(ctx.getText()) {
+                case "true", "false" -> expressions.add(new ConstValue(ConstValue.parseBoolean(ctx.getText())));
+                // TODO Look at enum or state values
+                default              -> expressions.add(new ReadValue(ctx.old!=null, ctx.getText()));
+            }
         }
 
         @Override

@@ -44,6 +44,7 @@ public class ModelEvaluationContext extends EvaluationContext {
         return null;
     }
 
+    @Override
     public Object getMacroValue(Identifier name) {
         if(model != null && model.getMacros().containsKey(name)) {
             Expression macro = model.getMacros().get(name);
@@ -54,6 +55,7 @@ public class ModelEvaluationContext extends EvaluationContext {
         return null;
     }
 
+    @Override
     public Function resolveFunction(Identifier name) {
         if(model != null) {
             Function function = model.getFunction(name);
@@ -72,9 +74,10 @@ public class ModelEvaluationContext extends EvaluationContext {
         return null;
     }
 
-    public Object getValue(Identifier name) {
-        if(name.isOld()) {
-            return getOldState().getValue(name.getNewIdentifier());
+    @Override
+    public Object getValue(Identifier name, boolean old) {
+        if(old) {
+            return getOldState().getValue(name);
         } else {
             // Look at enum values first
             EnumerableType<?>.Instance value = getEnumerableValue(name);
@@ -93,6 +96,7 @@ public class ModelEvaluationContext extends EvaluationContext {
         }
     }
 
+    @Override
     public void setValue(Identifier name, Object value) {
         Variable<?> register = model.getRegister(name);
         if(register==null) {

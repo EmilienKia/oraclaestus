@@ -10,6 +10,8 @@
     </parent>
 
     <artifactId>simple</artifactId>
+    <name>Oraclaestus simple example</name>
+    <description>Simple example of Oraclaestus simulation execution with a simple Yoyo model</description>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>

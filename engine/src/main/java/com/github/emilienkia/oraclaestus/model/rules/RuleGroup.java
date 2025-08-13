@@ -60,12 +60,12 @@ public class RuleGroup implements Rule {
         }
 
         @Override
-        public Object getValue(Identifier name) {
+        public Object getValue(Identifier name, boolean old) {
             Variable<?> variable = variables.get(name);
             if (variable != null) {
                 return values.get(name);
             }
-            return super.getValue(name);
+            return super.getValue(name, old);
         }
 
         public void setValue(Identifier name, Object value) {

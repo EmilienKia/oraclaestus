@@ -1,5 +1,6 @@
 package com.github.emilienkia.oraclaestus.model;
 
+import lombok.Getter;
 import lombok.NonNull;
 
 import java.util.ArrayList;
@@ -17,10 +18,11 @@ public class Identifier implements Comparable<Identifier> {
 
     public Identifier(List<String> path) {
         this.path = path;
+        // TODO check validity
     }
 
     public Identifier(String... path) {
-        this.path.addAll(Arrays.asList(path));
+        this(Arrays.asList(path));
     }
 
     public List<String> getPath() {
@@ -29,20 +31,7 @@ public class Identifier implements Comparable<Identifier> {
 
     public boolean isValid() {
         return !path.isEmpty() && path.stream().allMatch(part -> part != null && !part.isEmpty());
-    }
-
-    public boolean isOld() {
-        return !path.isEmpty() && path.getFirst()!=null && path.getFirst().startsWith("~");
-    }
-
-    public Identifier getNewIdentifier() {
-        if(isOld()) {
-            List<String> newPath = new ArrayList<>(this.path);
-            newPath.set(0, newPath.get(0).substring(1)); // Remove the leading '~'
-            return new Identifier(newPath);
-        } else {
-            return this;
-        }
+        // TODO add check content validity
     }
 
     public String getLast() {
@@ -67,6 +56,7 @@ public class Identifier implements Comparable<Identifier> {
         if (identifier == null || identifier.isBlank()) {
             return new Identifier();
         }
+        identifier = identifier.trim();
         String[] parts = identifier.split("\\.");
         return new Identifier(Arrays.asList(parts));
     }

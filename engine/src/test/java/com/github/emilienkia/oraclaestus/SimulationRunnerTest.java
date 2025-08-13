@@ -56,7 +56,7 @@ class SimulationRunnerTest {
     void testInitAtExecutionStart() throws IOException, ExecutionException, InterruptedException {
 
         String source =
-                """
+"""
 name: "Test model"
 id:   test_model
 

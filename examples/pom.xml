@@ -11,6 +11,7 @@
 
     <artifactId>examples</artifactId>
     <packaging>pom</packaging>
+    <name>Oraclaestus examples</name>
     <modules>
         <module>simple</module>
     </modules>

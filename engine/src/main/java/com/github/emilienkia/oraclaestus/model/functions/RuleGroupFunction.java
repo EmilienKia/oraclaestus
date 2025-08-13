@@ -52,13 +52,14 @@ public class RuleGroupFunction extends Function implements Dumpable {
         }
 
         @Override
-        public Object getValue(Identifier name) {
+        public Object getValue(Identifier name, boolean old) {
             if (values.containsKey(name)) {
                 return values.get(name);
             }
-            return super.getValue(name);
+            return super.getValue(name, old);
         }
 
+        @Override
         public void setValue(Identifier name, Object value) {
             Variable<?> register = parameters.stream().filter(p -> p.getName().equals(name)).findFirst().orElse(null);
             if(register!=null) {
