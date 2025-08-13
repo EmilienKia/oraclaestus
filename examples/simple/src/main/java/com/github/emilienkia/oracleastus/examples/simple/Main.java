@@ -3,7 +3,7 @@ package com.github.emilienkia.oracleastus.examples.simple;
 
 import com.github.emilienkia.oraclaestus.ModelParserHelper;
 import com.github.emilienkia.oraclaestus.SimulationRunner;
-import com.github.emilienkia.oraclaestus.model.Asset;
+import com.github.emilienkia.oraclaestus.model.Entity;
 import com.github.emilienkia.oraclaestus.model.Model;
 import com.github.emilienkia.oraclaestus.model.Simulation;
 import com.github.emilienkia.oraclaestus.model.State;
@@ -59,15 +59,15 @@ rules {
         ModelParserHelper helper = new ModelParserHelper();
         Model model = helper.parseString(SOURCE);
 
-        Asset test = model.createAsset("test");
+        Entity test = model.createEntity("test");
 
         // Create a simulation with the current time and a duration of 1 second
         Simulation simulation = new Simulation(LocalDateTime.now(), Duration.ofSeconds(1));
         // Register default module to have access to rand function
         simulation.registerDefaultModules();
 
-        // Add the asset to the simulation
-        String id = simulation.addAsset(test);
+        // Add the entity to the simulation
+        String id = simulation.addEntity(test);
 
         // Start the simulation, two steps per second
         TimeUnit stepTimeUnit = TimeUnit.MILLISECONDS;

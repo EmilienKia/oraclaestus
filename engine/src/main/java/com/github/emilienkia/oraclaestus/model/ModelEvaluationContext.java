@@ -19,7 +19,7 @@ public class ModelEvaluationContext extends EvaluationContext {
     Simulation simulation;
 
     Model model;
-    Asset asset;
+    Entity entity;
 
     State oldState;
     State newState;

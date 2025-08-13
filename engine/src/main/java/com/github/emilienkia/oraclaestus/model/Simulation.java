@@ -27,13 +27,13 @@ public class Simulation {
 
     String name;
 
-    Map<String, Asset> assets = new HashMap<>();
+    Map<String, Entity> entities = new HashMap<>();
 
     Map<Identifier, Module> modules = new HashMap<>();
 
     String loggerPrefix;
     Logger simulationLogger;
-    Map<String, Logger> assetLoggers = new HashMap<>();
+    Map<String, Logger> entityLoggers = new HashMap<>();
 
     public Simulation() {
         this.time = LocalDateTime.now();
@@ -77,36 +77,36 @@ public class Simulation {
         addModule(Identifier.fromString("log"), LogModule.getModule());
     }
 
-    public String addAsset(Asset asset) {
-        assets.put(asset.getId(), asset);
-        return asset.getId();
+    public String addEntity(Entity entity) {
+        entities.put(entity.getId(), entity);
+        return entity.getId();
     }
 
-    public State getCurrentState(String assetName) {
-        Asset asset = assets.get(assetName);
-        if (asset == null) {
-            throw new IllegalArgumentException("Asset with name " + assetName + " does not exist.");
+    public State getCurrentState(String entityName) {
+        Entity entity = entities.get(entityName);
+        if (entity == null) {
+            throw new IllegalArgumentException("Entity with name " + entityName + " does not exist.");
         }
-        return asset.getCurrentState();
+        return entity.getCurrentState();
     }
 
     public void start() {
         simulationLogger = LoggerFactory.getLogger((loggerPrefix != null && !loggerPrefix.isBlank() ? loggerPrefix : this.getClass().getName()) + "." + getName());
 
-        for (Asset asset : assets.values()) {
-            Logger assetLogger = LoggerFactory.getLogger(simulationLogger.getName() + "." + asset.getId());
-            assetLoggers.put(asset.getId(), assetLogger);
+        for (Entity entity : entities.values()) {
+            Logger entityLogger = LoggerFactory.getLogger(simulationLogger.getName() + "." + entity.getId());
+            entityLoggers.put(entity.getId(), entityLogger);
 
             State state = new State();
             ModelEvaluationContext context = new ModelEvaluationContext(
                     this,
-                    asset.getModel(),
-                    asset,
+                    entity.getModel(),
+                    entity,
                     state,
                     state,
-                    assetLogger
+                    entityLogger
             );
-            for(Map.Entry<Identifier, Variable<?>> entry : asset.getModel().getRegisters().entrySet()) {
+            for(Map.Entry<Identifier, Variable<?>> entry : entity.getModel().getRegisters().entrySet()) {
                 if(entry.getValue() instanceof Variable<?> variable) {
                     if(variable.getDefaultValue()!=null) {
                         Object defaultValue = variable.createDefaultValue();
@@ -117,28 +117,28 @@ public class Simulation {
                     }
                 }
             }
-            asset.setCurrentState(state);
+            entity.setCurrentState(state);
         }
     }
 
     public void step() {
         Temporal newTime = time.plus(duration);
 
-        Map<Asset, List<Identifier>> differences = new HashMap<>();
+        Map<Entity, List<Identifier>> differences = new HashMap<>();
 
-        for (Asset asset : assets.values()) {
+        for (Entity entity : entities.values()) {
 
             ModelEvaluationContext context = new ModelEvaluationContext(
                     this,
-                    asset.getModel(),
-                    asset,
-                    asset.getCurrentState(),
-                    asset.getCurrentState().clone(),
-                    assetLoggers.get(asset.getId())
+                    entity.getModel(),
+                    entity,
+                    entity.getCurrentState(),
+                    entity.getCurrentState().clone(),
+                    entityLoggers.get(entity.getId())
             );
 
-            // Apply rules to the asset
-            for (RuleGroup rules : context.getAsset().getRuleGroups()) {
+            // Apply rules to the entity
+            for (RuleGroup rules : context.getEntity().getRuleGroups()) {
                 try {
                     rules.apply(context);
                 } catch (Return e) {
@@ -146,12 +146,12 @@ public class Simulation {
                 }
             }
 
-            // Update the current state of the asset
-            asset.setCurrentState(context.getNewState());
+            // Update the current state of the entity
+            entity.setCurrentState(context.getNewState());
 
             List<Identifier> diff = compareStates(context.getOldState(), context.getNewState());
             if (!diff.isEmpty()) {
-                differences.put(asset, diff);
+                differences.put(entity, diff);
             }
         }
 
@@ -174,16 +174,16 @@ public class Simulation {
          return differences;
      }
 
-    void analyzeDifferences(Map<Asset, List<Identifier>> diff) {
-        for (Map.Entry<Asset, List<Identifier>> entry : diff.entrySet()) {
-            Asset asset = entry.getKey();
+    void analyzeDifferences(Map<Entity, List<Identifier>> diff) {
+        for (Map.Entry<Entity, List<Identifier>> entry : diff.entrySet()) {
+            Entity entity = entry.getKey();
             List<Identifier> changedKeys = entry.getValue();
             for(Identifier key : changedKeys) {
-                Object oldValue = asset.getCurrentState().getValue(key);
-                Object newValue = asset.getCurrentState().getValue(key);
+                Object oldValue = entity.getCurrentState().getValue(key);
+                Object newValue = entity.getCurrentState().getValue(key);
 
                 for (EventListener listener : eventListeners) {
-                    listener.onStateChange(new StateChangeEvent(this, asset, key, oldValue, newValue));
+                    listener.onStateChange(new StateChangeEvent(this, entity, key, oldValue, newValue));
                 }
             }
         }
@@ -204,9 +204,9 @@ public class Simulation {
 
     public void dump() {
         System.out.println("Simulation time: " + time);
-        for (Asset asset : assets.values()) {
-            System.out.println("Asset ID: " + asset.getId());
-            asset.getCurrentState().dump();
+        for (Entity entity : entities.values()) {
+            System.out.println("Entity ID: " + entity.getId());
+            entity.getCurrentState().dump();
         }
     }
 }

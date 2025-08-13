@@ -1,9 +1,6 @@
 package com.github.emilienkia.oraclaestus.model.expressions;
 
-import com.github.emilienkia.oraclaestus.model.Asset;
 import com.github.emilienkia.oraclaestus.model.EvaluationContext;
-import com.github.emilienkia.oraclaestus.model.Model;
-import com.github.emilienkia.oraclaestus.model.State;
 
 public class Negation implements Expression{
 

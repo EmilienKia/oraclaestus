@@ -41,7 +41,7 @@ class SimulationRunnerTest {
                                 )))).build();
 
         Simulation simulation = new Simulation(LocalDateTime.now(), Duration.ofSeconds(1));
-        simulation.addAsset(model.createAsset("test"));
+        simulation.addEntity(model.createEntity("test"));
 
         simulationRunner.startSimulation(simulation, 1, TimeUnit.SECONDS);
 
@@ -75,7 +75,7 @@ rules {
         Model model = helper.parseString(source);
 
         Simulation simulation = new Simulation(LocalDateTime.now(), Duration.ofSeconds(1));
-        String id = simulation.addAsset(model.createAsset("test"));
+        String id = simulation.addEntity(model.createEntity("test"));
 
         simulation.start();
 
@@ -116,7 +116,7 @@ rules {
 
         SimulationRunner simulationRunner = new SimulationRunner();
         Simulation simulation = new Simulation(LocalDateTime.now(), Duration.ofSeconds(1));
-        String id = simulation.addAsset(model.createAsset("test"));
+        String id = simulation.addEntity(model.createEntity("test"));
         SimulationRunner.SimulationSession session = simulationRunner.startSimulation(simulation, 1);
 
         session.get();
@@ -156,7 +156,7 @@ rules {
 
         SimulationRunner simulationRunner = new SimulationRunner();
         Simulation simulation = new Simulation(LocalDateTime.now(), Duration.ofSeconds(1));
-        String id = simulation.addAsset(model.createAsset("test"));
+        String id = simulation.addEntity(model.createEntity("test"));
         SimulationRunner.SimulationSession session = simulationRunner.startSimulation(simulation, 1);
 
         session.get();
@@ -197,7 +197,7 @@ rules {
         SimulationRunner simulationRunner = new SimulationRunner();
         Simulation simulation = new Simulation(LocalDateTime.now(), Duration.ofSeconds(1));
         simulation.registerDefaultModules();
-        String id = simulation.addAsset(model.createAsset("test"));
+        String id = simulation.addEntity(model.createEntity("test"));
         SimulationRunner.SimulationSession session = simulationRunner.startSimulation(simulation, 1);
 
         session.get();
@@ -250,7 +250,7 @@ rules {
         simulation.setLoggerPrefix("simulation");
         simulation.setName("simu");
         simulation.registerDefaultModules();
-        String id = simulation.addAsset(model.createAsset("test"));
+        String id = simulation.addEntity(model.createEntity("test"));
 
         LogCaptor logCaptor = LogCaptor.forName("simulation.simu." + id);
 

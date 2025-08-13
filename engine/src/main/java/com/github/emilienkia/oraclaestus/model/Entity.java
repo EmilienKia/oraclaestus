@@ -1,13 +1,12 @@
 package com.github.emilienkia.oraclaestus.model;
 
-import com.github.emilienkia.oraclaestus.model.rules.Rule;
 import com.github.emilienkia.oraclaestus.model.rules.RuleGroup;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class Asset {
+public class Entity {
 
     String id;
     String name;

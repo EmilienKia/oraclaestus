@@ -42,18 +42,18 @@ public class Model {
     @Singular
     List<RuleGroup> ruleGroups = new ArrayList<>();
 
-    public Asset createAsset(String name) {
-        Asset asset = new Asset();
-        asset.setId(this.id + "-" + name);
-        asset.setName(name);
-        asset.setModel(this);
+    public Entity createEntity(String name) {
+        Entity entity = new Entity();
+        entity.setId(this.id + "-" + name);
+        entity.setName(name);
+        entity.setModel(this);
 
-        asset.setRuleGroups(this.ruleGroups.stream().toList());
+        entity.setRuleGroups(this.ruleGroups.stream().toList());
 
         State state = new State();
         state.setValues(registers.entrySet().stream().collect(HashMap::new, (map, elem) -> map.put(elem.getKey(), elem.getValue().createDefaultValue()), HashMap::putAll));
-        asset.setCurrentState(state);
-        return asset;
+        entity.setCurrentState(state);
+        return entity;
     }
 
 

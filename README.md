@@ -95,14 +95,14 @@ TODO: Add example of model creation programmatically.
 ### Instantiate entities in simulation
 Once you have a model, you can instantiate entities in the simulation.
 
-You just have to call the `createAsset` method of the model, passing the id of the asset you want to create.
-Then you just have to call the `addAsset` method of the simulation, passing the asset you want to add.
+You just have to call the `createEntity` method of the model, passing the id of the entity you want to create.
+Then you just have to call the `addEntity` method of the simulation, passing the entity you want to add.
 
 ```java
-String id = simulation.addAsset(model.createAsset("test"));
+String id = simulation.addEntity(model.createEntity("test"));
 ```
 
-Note: the id returned by the `addAsset` method is the id of the asset in the simulation.
+Note: the id returned by the `addEntity` method is the id of the entity in the simulation.
 It may be used to manage it afterward.
 
 ### Run the simulation
@@ -127,7 +127,7 @@ If not specified, the simulation will run at the maximum speed, without any paus
 
 ### Query the simulation
 
-At any time, you can query the simulation to get the current state of the entities, by their id (returned by addAsset(...)).
+At any time, you can query the simulation to get the current state of the entities, by their id (returned by addEntity(...)).
 And look for the current value of any register of the entity.
 
 ```java
