@@ -7,7 +7,6 @@ import com.github.emilienkia.oraclaestus.model.expressions.*;
 import com.github.emilienkia.oraclaestus.model.expressions.FunctionCall;
 import com.github.emilienkia.oraclaestus.model.rules.*;
 import com.github.emilienkia.oraclaestus.model.types.EnumerationType;
-import com.github.emilienkia.oraclaestus.model.types.StateType;
 import com.github.emilienkia.oraclaestus.model.types.Type;
 import com.github.emilienkia.oraclaestus.model.variables.Variable;
 import org.junit.jupiter.api.Test;
@@ -119,7 +118,7 @@ registers {
         BLUE
     } = GREEN
     b: boolean = true
-    st: state {
+    st: enum {
         ON,
         OFF,
         UNKNOWN
@@ -181,10 +180,10 @@ rules {
         {
             Variable<?> var = model.getRegister("st");
             assertThat(var).isNotNull();
-            assertThat(var.getType()).isEqualTo(Type.STATE);
-            assertThat(var.getDefaultValue()).isNotNull().isInstanceOf(StateType.Instance.class);
-            StateType.Instance stateValue = (StateType.Instance)var.getDefaultValue();
-            StateType type = stateValue.getStateType() ;
+            assertThat(var.getType()).isEqualTo(Type.ENUM);
+            assertThat(var.getDefaultValue()).isNotNull().isInstanceOf(EnumerationType.Instance.class);
+            EnumerationType.Instance stateValue = (EnumerationType.Instance)var.getDefaultValue();
+            EnumerationType type = stateValue.getEnumerationType() ;
             assertThat(type).isNotNull();
             assertThat(type.getCount()).isEqualTo(3);
             assertThat(type.getValue("ON")).isEqualTo(0);
@@ -228,6 +227,76 @@ rules {
         }
 
     }
+
+
+    @Test
+    void testParsingTypes() throws IOException {
+        String source =
+                """
+                types {
+                    enum color {
+                        RED,
+                        GREEN,
+                        BLUE
+                    }
+                }
+                registers {
+                    c: color = RED
+                }
+                
+                rules {
+                    c = GREEN
+                }
+                """;
+
+        ModelParserHelper helper = new ModelParserHelper();
+        Model model = helper.parseString(source);
+        assertThat(model).isNotNull();
+
+        assertThat(model.getEnumerations()).hasSize(1);
+        {
+            assertThat(model.getCustomTypes()).hasSize(1);
+            assertThat(model.getCustomTypes().get("color")).isNotNull().isInstanceOf(EnumerationType.class);
+            EnumerationType colorType = (EnumerationType) model.getCustomTypes().get("color");
+            assertThat(colorType.getCount()).isEqualTo(3);
+            assertThat(colorType.getValue("RED")).isEqualTo(0);
+            assertThat(colorType.getValue("GREEN")).isEqualTo(1);
+            assertThat(colorType.getValue("BLUE")).isEqualTo(2);
+        }
+
+        assertThat(model.getRegisters()).hasSize(1);
+        {
+            Variable<?> c = model.getRegister("c");
+            assertThat(c).isNotNull();
+            assertThat(c.getType()).isEqualTo(Type.ENUM);
+            assertThat(c.getDefaultValue()).isNotNull().isInstanceOf(EnumerationType.Instance.class);
+            EnumerationType.Instance enumValue = (EnumerationType.Instance)c.getDefaultValue();
+            EnumerationType type = enumValue.getEnumerationType() ;
+            assertThat(type).isNotNull();
+            assertThat(type.getCount()).isEqualTo(3);
+            assertThat(type.getValue("RED")).isEqualTo(0);
+            assertThat(type.getValue("GREEN")).isEqualTo(1);
+            assertThat(type.getValue("BLUE")).isEqualTo(2);
+            assertThat(enumValue.getValue()).isEqualTo(0); // RED
+        }
+
+        assertThat(model.getRuleGroups()).hasSize(1);
+        RuleGroup ruleGroup = model.getRuleGroups().getFirst();
+        assertThat(ruleGroup).isNotNull();
+        assertThat(ruleGroup.getRules()).hasSize(1);
+
+        {
+            Rule rule = ruleGroup.getRules().getFirst();
+            assertThat(rule).isNotNull().isInstanceOf(Assignation.class);
+            Assignation assignation = (Assignation) rule;
+            assertThat(assignation.getVariableName()).isEqualTo("c");
+            assertThat(assignation.getExpression()).isNotNull().isInstanceOf(ReadValue.class);
+            ReadValue readValue = (ReadValue) assignation.getExpression();
+            assertThat(readValue.getIdentifier()).isEqualTo("GREEN");
+        }
+
+    }
+
 
     @Test
     void testParsingRules() throws IOException {

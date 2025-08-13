@@ -6,7 +6,7 @@ import lombok.Getter;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class EnumerableType<T> implements TypeDescriptor<T> {
+public abstract class EnumerableType<T> implements CustomType<T> {
 
     int next = 0;
 
@@ -33,7 +33,7 @@ public abstract class EnumerableType<T> implements TypeDescriptor<T> {
     }
 
     public Integer getValue(Identifier name) {
-        if(name == null || name.isValid()) {
+        if(name == null || !name.isValid()) {
             throw new IllegalArgumentException("Name cannot be null or empty");
         }
         Integer value = names.get(name.getLast());
@@ -61,7 +61,6 @@ public abstract class EnumerableType<T> implements TypeDescriptor<T> {
         @Getter
         int value = 0;
 
-
         public Instance() {
         }
 
@@ -70,6 +69,10 @@ public abstract class EnumerableType<T> implements TypeDescriptor<T> {
                 throw new IllegalArgumentException("Value does not exist in enumeration: " + value);
             }
             this.value = value;
+        }
+
+        public String getName() {
+            return values.get(value);
         }
 
         public EnumerableType<T> getEnumerable() {

@@ -4,7 +4,6 @@ import com.github.emilienkia.oraclaestus.model.expressions.Expression;
 import com.github.emilienkia.oraclaestus.model.functions.Function;
 import com.github.emilienkia.oraclaestus.model.modules.Module;
 import com.github.emilienkia.oraclaestus.model.types.EnumerableType;
-import com.github.emilienkia.oraclaestus.model.types.StateType;
 import com.github.emilienkia.oraclaestus.model.variables.Variable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,18 +27,7 @@ public class ModelEvaluationContext extends EvaluationContext {
 
     public EnumerableType<?>.Instance getEnumerableValue(Identifier name) {
         if(model!=null) {
-            // Look at state values first
-            {
-                StateType.Instance value = model.getStateValue(name);
-                if (value != null) {
-                    return value;
-                }
-            }
-
-            // Look at enum values first
-            {
-                return model.getEnumerationValue(name);
-            }
+            return model.getEnumerationValue(name);
         }
         return null;
     }

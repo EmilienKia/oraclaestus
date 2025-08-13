@@ -292,6 +292,18 @@ public class ModelParserHelper {
         }
 
         @Override
+        public void exitEnumTypeDeclaration(ModelParser.EnumTypeDeclarationContext ctx) {
+            Identifier enumName = Identifier.fromString(ctx.enum_name.getText());
+
+            EnumerationType type = new EnumerationType();
+            ctx.enum_value.stream().map(Token::getText).forEach(type::add);
+            model.getEnumerations().add(type);
+            this.type = type;
+
+            model.getCustomTypes().put(enumName.toString(), type);
+        }
+
+        @Override
         public void exitRules(ModelParser.RulesContext ctx) {
             ModelParsingContext modelContext = (ModelParsingContext) context.element();
             if(model==null) {
@@ -581,7 +593,9 @@ public class ModelParserHelper {
             switch(ctx.getText()) {
                 case "true", "false" -> expressions.add(new ConstValue(ConstValue.parseBoolean(ctx.getText())));
                 // TODO Look at enum or state values
-                default              -> expressions.add(new ReadValue(ctx.old!=null, ctx.getText()));
+                default              -> {
+                    expressions.add(new ReadValue(ctx.old!=null, ctx.getText()));
+                }
             }
         }
 
@@ -614,11 +628,12 @@ public class ModelParserHelper {
         }
 
         @Override
-        public void exitStateType(ModelParser.StateTypeContext ctx) {
-            StateType type = new StateType();
-            ctx.enum_value.stream().map(Token::getText).forEach(type::add);
-            model.getStates().add(type);
-            this.type = type;
+        public void exitUserDefinedType(ModelParser.UserDefinedTypeContext ctx) {
+            this.type = model.getCustomTypes().get(ctx.getText());
+            if(this.type==null) {
+                // TODO Error handling
+                throw new IllegalArgumentException("Unknown user defined type: " + ctx.getText());
+            }
         }
 
     }

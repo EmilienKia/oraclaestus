@@ -7,8 +7,13 @@ import com.github.emilienkia.oraclaestus.model.State;
 import com.github.emilienkia.oraclaestus.model.expressions.Addition;
 import com.github.emilienkia.oraclaestus.model.rules.Assignation;
 import com.github.emilienkia.oraclaestus.model.expressions.ReadValue;
+import com.github.emilienkia.oraclaestus.model.rules.Rule;
 import com.github.emilienkia.oraclaestus.model.rules.RuleGroup;
+import com.github.emilienkia.oraclaestus.model.types.EnumerableType;
+import com.github.emilienkia.oraclaestus.model.types.EnumerationType;
+import com.github.emilienkia.oraclaestus.model.types.Type;
 import com.github.emilienkia.oraclaestus.model.variables.IntegerVariable;
+import com.github.emilienkia.oraclaestus.model.variables.Variable;
 import nl.altindag.log.LogCaptor;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.Test;
@@ -129,6 +134,51 @@ rules {
         assertThat(state.getValue("s")).isNotNull().isInstanceOf(String.class).isEqualTo("test");
         assertThat(state.getValue("b")).isNotNull().isInstanceOf(Boolean.class).isEqualTo(true);
         assertThat(state.getValue("f")).isNotNull().isInstanceOf(Float.class).isEqualTo(3.14f);
+    }
+
+
+    @Test
+    void testEnumAssignment() throws IOException, ExecutionException, InterruptedException {
+        String source =
+                """
+                types {
+                    enum color {
+                        RED,
+                        GREEN,
+                        BLUE
+                    }
+                }
+                registers {
+                    c: color = RED
+                    d: color = RED
+                }
+                
+                rules {
+                    c = GREEN
+                    d = c
+                }
+                """;
+
+        ModelParserHelper helper = new ModelParserHelper();
+        Model model = helper.parseString(source);
+        assertThat(model).isNotNull();
+
+        SimulationRunner simulationRunner = new SimulationRunner();
+        Simulation simulation = new Simulation(LocalDateTime.now(), Duration.ofSeconds(1));
+        String id = simulation.addEntity(model.createEntity("test"));
+        SimulationRunner.SimulationSession session = simulationRunner.startSimulation(simulation, 1);
+
+        session.get();
+
+        assertThat(session.getRemainingSteps()).isEqualTo(0);
+
+        State state = simulation.getCurrentState(id);
+        assertThat(state).isNotNull();
+        assertThat(state.getValue("d")).isNotNull().isInstanceOf(EnumerableType.Instance.class);
+        EnumerableType<?>.Instance d = (EnumerableType<?>.Instance) state.getValue("d");
+        assertThat(d).isNotNull();
+        assertThat(d.getValue()).isEqualTo(1);
+        assertThat(d.getName()).isEqualTo("GREEN");
     }
 
     @Test

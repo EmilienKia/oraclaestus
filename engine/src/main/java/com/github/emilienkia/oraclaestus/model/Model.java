@@ -3,8 +3,8 @@ package com.github.emilienkia.oraclaestus.model;
 import com.github.emilienkia.oraclaestus.model.expressions.Expression;
 import com.github.emilienkia.oraclaestus.model.functions.Function;
 import com.github.emilienkia.oraclaestus.model.rules.RuleGroup;
+import com.github.emilienkia.oraclaestus.model.types.CustomType;
 import com.github.emilienkia.oraclaestus.model.types.EnumerationType;
-import com.github.emilienkia.oraclaestus.model.types.StateType;
 import com.github.emilienkia.oraclaestus.model.variables.Variable;
 import lombok.*;
 
@@ -37,7 +37,7 @@ public class Model {
     List<EnumerationType> enumerations = new ArrayList<>();
 
     @Singular
-    List<StateType> states = new ArrayList<>();
+    Map<String, CustomType<?>> customTypes = new HashMap<>();
 
     @Singular
     List<RuleGroup> ruleGroups = new ArrayList<>();
@@ -55,7 +55,6 @@ public class Model {
         entity.setCurrentState(state);
         return entity;
     }
-
 
     public Variable<?> getRegister(String name) {
         return getRegister(Identifier.fromString(name));
@@ -80,19 +79,6 @@ public class Model {
     public Function getFunction(Identifier name) {
         return functions.get(name);
     }
-
-
-
-    public StateType.Instance getStateValue(Identifier name) {
-        for (StateType state : states) {
-            Integer value = state.getValue(name);
-            if (value != null) {
-                return state.cast(value);
-            }
-        }
-        return null;
-    }
-
 
     public EnumerationType.Instance getEnumerationValue(Identifier name) {
         for (EnumerationType enumeration : enumerations) {

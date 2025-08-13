@@ -1,7 +1,7 @@
 grammar Model;
 
 model
-    : metadata (registers|rules|functions)*
+    : metadata (registers|types|rules|functions)*
     ;
 
 metadata
@@ -22,6 +22,14 @@ var_decl
 
 macro_decl
     : macro_name=identifier ':=' expression # MacroDeclaration
+    ;
+
+types
+    : 'types' '{' type_decl* '}'
+    ;
+
+type_decl
+    : 'enum' enum_name=identifier '{' enum_value+=ID (',' enum_value+=ID)* '}' # EnumTypeDeclaration
     ;
 
 rules
@@ -110,7 +118,7 @@ type
     | 'string'          # StringType
     | 'boolean'         # BooleanType
     | 'enum'  '{' enum_value+=ID (',' enum_value+=ID)* '}'   # EnumType
-    | 'state' '{' enum_value+=ID (',' enum_value+=ID)* '}'   # StateType
+    | identifier        # UserDefinedType
     ;
 
 value
