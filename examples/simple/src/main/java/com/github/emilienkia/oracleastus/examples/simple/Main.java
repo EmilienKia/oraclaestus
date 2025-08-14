@@ -3,14 +3,12 @@ package com.github.emilienkia.oracleastus.examples.simple;
 
 import com.github.emilienkia.oraclaestus.ModelParserHelper;
 import com.github.emilienkia.oraclaestus.SimulationRunner;
-import com.github.emilienkia.oraclaestus.model.Entity;
-import com.github.emilienkia.oraclaestus.model.Model;
-import com.github.emilienkia.oraclaestus.model.Simulation;
-import com.github.emilienkia.oraclaestus.model.State;
+import com.github.emilienkia.oraclaestus.model.*;
 
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 public class Main {
@@ -51,7 +49,7 @@ rules {
 }
 """;
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, ExecutionException, InterruptedException {
 
         SimulationRunner simulationRunner = new SimulationRunner();
 
@@ -73,15 +71,17 @@ rules {
         TimeUnit stepTimeUnit = TimeUnit.MILLISECONDS;
         long stepRate = 500; // 500 milliseconds per step
 
-        SimulationRunner.SimulationSession session = simulationRunner.startSimulation(simulation, stepRate, stepTimeUnit);
+        long turnCount = 1; // We will stop the simulation after 5 turns
+
+        Session session = simulationRunner.startSimulation(simulation, stepRate, stepTimeUnit);
 
         System.out.println("Yoyo value:");
         while(true) {
-            State currentState = simulation.getCurrentState(id);
+            EntityState currentState = simulation.getCurrentState(id);
             System.out.println(currentState.getValue("current"));
-            if(currentState.getValue("turn") instanceof Integer turn && turn >= 1) {
+            if(currentState.getValue("turn") instanceof Integer turn && turn >= turnCount) {
                 // Exit at the fifth turn
-                System.out.println("Reached 5 turns, exiting simulation.");
+                System.out.println("Reached " + turnCount + " turns, exiting simulation.");
                 break;
             }
             try {
@@ -94,6 +94,12 @@ rules {
             }
         }
 
-        simulationRunner.stopSimulation(simulation);
+        // Stop the simulation
+        System.out.println("Stop the simulation.");
+        session.stop();
+
+        System.out.println("Shutdown the runner.");
+        simulationRunner.shutdown();
+        simulationRunner.awaitTermination(5, TimeUnit.SECONDS);
     }
 }

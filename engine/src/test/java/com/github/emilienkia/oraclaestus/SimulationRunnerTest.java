@@ -1,19 +1,12 @@
 package com.github.emilienkia.oraclaestus;
 
-import com.github.emilienkia.oraclaestus.model.Identifier;
-import com.github.emilienkia.oraclaestus.model.Model;
-import com.github.emilienkia.oraclaestus.model.Simulation;
-import com.github.emilienkia.oraclaestus.model.State;
+import com.github.emilienkia.oraclaestus.model.*;
 import com.github.emilienkia.oraclaestus.model.expressions.Addition;
 import com.github.emilienkia.oraclaestus.model.rules.Assignation;
 import com.github.emilienkia.oraclaestus.model.expressions.ReadValue;
-import com.github.emilienkia.oraclaestus.model.rules.Rule;
 import com.github.emilienkia.oraclaestus.model.rules.RuleGroup;
 import com.github.emilienkia.oraclaestus.model.types.EnumerableType;
-import com.github.emilienkia.oraclaestus.model.types.EnumerationType;
-import com.github.emilienkia.oraclaestus.model.types.Type;
 import com.github.emilienkia.oraclaestus.model.variables.IntegerVariable;
-import com.github.emilienkia.oraclaestus.model.variables.Variable;
 import nl.altindag.log.LogCaptor;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.Test;
@@ -48,12 +41,12 @@ class SimulationRunnerTest {
         Simulation simulation = new Simulation(LocalDateTime.now(), Duration.ofSeconds(1));
         simulation.addEntity(model.createEntity("test"));
 
-        simulationRunner.startSimulation(simulation, 1, TimeUnit.SECONDS);
+        Session session = simulationRunner.startSimulation(simulation, 1, TimeUnit.SECONDS);
 
         // Wait so long
         Thread.sleep(4_000);
 
-        simulationRunner.stopSimulation(simulation);
+        session.stop();
 
     }
 
@@ -84,7 +77,7 @@ rules {
 
         simulation.start();
 
-        State state = simulation.getCurrentState(id);
+        EntityState state = simulation.getCurrentState(id);
         assertThat(state).isNotNull();
         assertThat(state.getValue("i")).isNotNull().isInstanceOf(Integer.class).isEqualTo(42);
         assertThat(state.getValue("s")).isNotNull().isInstanceOf(String.class).isEqualTo("test");
@@ -122,13 +115,13 @@ rules {
         SimulationRunner simulationRunner = new SimulationRunner();
         Simulation simulation = new Simulation(LocalDateTime.now(), Duration.ofSeconds(1));
         String id = simulation.addEntity(model.createEntity("test"));
-        SimulationRunner.SimulationSession session = simulationRunner.startSimulation(simulation, 1);
+        Session session = simulationRunner.startSimulation(simulation, 1);
 
         session.get();
 
         assertThat(session.getRemainingSteps()).isEqualTo(0);
 
-        State state = simulation.getCurrentState(id);
+        EntityState state = simulation.getCurrentState(id);
         assertThat(state).isNotNull();
         assertThat(state.getValue("i")).isNotNull().isInstanceOf(Integer.class).isEqualTo(42);
         assertThat(state.getValue("s")).isNotNull().isInstanceOf(String.class).isEqualTo("test");
@@ -166,13 +159,13 @@ rules {
         SimulationRunner simulationRunner = new SimulationRunner();
         Simulation simulation = new Simulation(LocalDateTime.now(), Duration.ofSeconds(1));
         String id = simulation.addEntity(model.createEntity("test"));
-        SimulationRunner.SimulationSession session = simulationRunner.startSimulation(simulation, 1);
+        Session session = simulationRunner.startSimulation(simulation, 1);
 
         session.get();
 
         assertThat(session.getRemainingSteps()).isEqualTo(0);
 
-        State state = simulation.getCurrentState(id);
+        EntityState state = simulation.getCurrentState(id);
         assertThat(state).isNotNull();
         assertThat(state.getValue("d")).isNotNull().isInstanceOf(EnumerableType.Instance.class);
         EnumerableType<?>.Instance d = (EnumerableType<?>.Instance) state.getValue("d");
@@ -207,13 +200,13 @@ rules {
         SimulationRunner simulationRunner = new SimulationRunner();
         Simulation simulation = new Simulation(LocalDateTime.now(), Duration.ofSeconds(1));
         String id = simulation.addEntity(model.createEntity("test"));
-        SimulationRunner.SimulationSession session = simulationRunner.startSimulation(simulation, 1);
+        Session session = simulationRunner.startSimulation(simulation, 1);
 
         session.get();
 
         assertThat(session.getRemainingSteps()).isEqualTo(0);
 
-        State state = simulation.getCurrentState(id);
+        EntityState state = simulation.getCurrentState(id);
         assertThat(state).isNotNull();
         assertThat(state.getValue("i")).isNotNull().isInstanceOf(Integer.class).isEqualTo(13);
     }
@@ -248,13 +241,13 @@ rules {
         Simulation simulation = new Simulation(LocalDateTime.now(), Duration.ofSeconds(1));
         simulation.registerDefaultModules();
         String id = simulation.addEntity(model.createEntity("test"));
-        SimulationRunner.SimulationSession session = simulationRunner.startSimulation(simulation, 1);
+        Session session = simulationRunner.startSimulation(simulation, 1);
 
         session.get();
 
         assertThat(session.getRemainingSteps()).isEqualTo(0);
 
-        State state = simulation.getCurrentState(id);
+        EntityState state = simulation.getCurrentState(id);
         assertThat(state).isNotNull();
         assertThat(state.getValue("f")).isNotNull().isInstanceOf(Float.class)
                 .asInstanceOf(InstanceOfAssertFactories.FLOAT)
@@ -304,7 +297,7 @@ rules {
 
         LogCaptor logCaptor = LogCaptor.forName("simulation.simu." + id);
 
-        SimulationRunner.SimulationSession session = simulationRunner.startSimulation(simulation, 1);
+        Session session = simulationRunner.startSimulation(simulation, 1);
 
         session.get();
 

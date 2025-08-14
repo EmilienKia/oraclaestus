@@ -35,6 +35,8 @@ public class Simulation {
     Logger simulationLogger;
     Map<String, Logger> entityLoggers = new HashMap<>();
 
+    SimulationState simulationState = new SimulationState();
+
     public Simulation() {
         this.time = LocalDateTime.now();
         this.duration = Duration.ofSeconds(1);
@@ -82,12 +84,12 @@ public class Simulation {
         return entity.getId();
     }
 
-    public State getCurrentState(String entityName) {
+    public EntityState getCurrentState(String entityName) {
         Entity entity = entities.get(entityName);
         if (entity == null) {
             throw new IllegalArgumentException("Entity with name " + entityName + " does not exist.");
         }
-        return entity.getCurrentState();
+        return simulationState.getEntityState(entity.id);
     }
 
     public void start() {
@@ -97,7 +99,7 @@ public class Simulation {
             Logger entityLogger = LoggerFactory.getLogger(simulationLogger.getName() + "." + entity.getId());
             entityLoggers.put(entity.getId(), entityLogger);
 
-            State state = new State();
+            EntityState state = new EntityState();
             ModelEvaluationContext context = new ModelEvaluationContext(
                     this,
                     entity.getModel(),
@@ -117,7 +119,7 @@ public class Simulation {
                     }
                 }
             }
-            entity.setCurrentState(state);
+            simulationState.setEntityState(entity.getId(), state);
         }
     }
 
@@ -126,14 +128,20 @@ public class Simulation {
 
         Map<Entity, List<Identifier>> differences = new HashMap<>();
 
+        SimulationState oldStates = simulationState.clone();
+        SimulationState newStates = oldStates.clone();
+
         for (Entity entity : entities.values()) {
+
+            EntityState currentState = oldStates.getEntityState(entity.id);
+            EntityState nesState = newStates.getEntityState(entity.id);
 
             ModelEvaluationContext context = new ModelEvaluationContext(
                     this,
                     entity.getModel(),
                     entity,
-                    entity.getCurrentState(),
-                    entity.getCurrentState().clone(),
+                    currentState,
+                    nesState,
                     entityLoggers.get(entity.getId())
             );
 
@@ -147,7 +155,7 @@ public class Simulation {
             }
 
             // Update the current state of the entity
-            entity.setCurrentState(context.getNewState());
+            simulationState.setEntityState(entity.getId(), context.getNewState());
 
             List<Identifier> diff = compareStates(context.getOldState(), context.getNewState());
             if (!diff.isEmpty()) {
@@ -158,11 +166,13 @@ public class Simulation {
         // Update the simulation time
         time = newTime;
 
+        simulationState = newStates;
+
         // Analyze differences and notify
-        analyzeDifferences(differences);
+        analyzeDifferences(oldStates, newStates, differences);
     }
 
-     static List<Identifier> compareStates(State oldState, State newState) {
+     static List<Identifier> compareStates(EntityState oldState, EntityState newState) {
          List<Identifier> differences = new java.util.ArrayList<>();
          for (Identifier key : oldState.getValues().keySet()) {
              Object oldValue = oldState.getValue(key);
@@ -174,13 +184,14 @@ public class Simulation {
          return differences;
      }
 
-    void analyzeDifferences(Map<Entity, List<Identifier>> diff) {
+    void analyzeDifferences(SimulationState oldState, SimulationState newState, Map<Entity, List<Identifier>> diff) {
         for (Map.Entry<Entity, List<Identifier>> entry : diff.entrySet()) {
             Entity entity = entry.getKey();
+            String entityId = entity.getId();
             List<Identifier> changedKeys = entry.getValue();
             for(Identifier key : changedKeys) {
-                Object oldValue = entity.getCurrentState().getValue(key);
-                Object newValue = entity.getCurrentState().getValue(key);
+                Object oldValue = oldState.getEntityValue(entityId, key);
+                Object newValue = newState.getEntityValue(entityId, key);
 
                 for (EventListener listener : eventListeners) {
                     listener.onStateChange(new StateChangeEvent(this, entity, key, oldValue, newValue));
@@ -199,14 +210,11 @@ public class Simulation {
     }
 
 
-
-
-
     public void dump() {
         System.out.println("Simulation time: " + time);
         for (Entity entity : entities.values()) {
             System.out.println("Entity ID: " + entity.getId());
-            entity.getCurrentState().dump();
+            simulationState.getEntityState(entity.getId()).dump();
         }
     }
 }

@@ -13,8 +13,15 @@ metadata_line
     ;
 
 registers
-    : 'registers' '{' (var_decl|macro_decl)* '}'
+    : 'registers' '{' (/*state_decl|*/var_decl|macro_decl)* '}'
     ;
+
+/*
+state_decl
+    : state_name=identifier ':' 'state' state_type=type ('=' state_def_value=expression)? # StateEnumDeclaration
+    | state_name=identifier ':' 'state' '{' enum_value+=ID (',' enum_value+=ID)* '}' ('=' state_def_value=expression)? # StateAnonymousDeclaration
+    ;
+*/
 
 var_decl
     : var_name=identifier ':' var_type=type ('=' var_def_value=expression)? # VariableDeclaration

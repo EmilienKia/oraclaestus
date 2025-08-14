@@ -1,6 +1,9 @@
 package com.github.emilienkia.oraclaestus;
 
+import com.github.emilienkia.oraclaestus.model.Session;
 import com.github.emilienkia.oraclaestus.model.Simulation;
+import com.github.emilienkia.oraclaestus.model.SimulationState;
+import lombok.NonNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,115 +13,177 @@ import static java.util.concurrent.Future.State.RUNNING;
 
 public class SimulationRunner {
 
-    public class SimulationSession implements Future<Void> {
+    class SimulationSession implements Session {
 
         Simulation simulation;
         long stepRate;
         TimeUnit stepTimeUnit;
         long stepCount = -1; // -1 means infinite steps
 
-        private /*Scheduled*/ Future<?> future;
+        private Future<?> future;
 
-        public SimulationSession(Simulation simulation, long stepRate, TimeUnit stepTimeUnit, long stepCount) {
+        Semaphore semaphore;
+
+        State state = State.STOPPED;
+        Exception exception = null;
+
+
+        public SimulationSession(@NonNull Simulation simulation, long stepRate, TimeUnit stepTimeUnit, long stepCount) {
             this.simulation = simulation;
             this.stepRate = stepRate;
             this.stepTimeUnit = stepTimeUnit;
             this.stepCount = stepCount;
         }
 
+        @Override
         public long getRemainingSteps() {
             return stepCount;
         }
 
         public void start() {
-            if ((future == null || future.isCancelled() || future.isDone()) && simulations != null) {
-                simulation.start();
-                if(stepRate > 0) {
-                    future = executor.scheduleAtFixedRate(this::step, stepRate, stepRate, stepTimeUnit);
-                } else {
-                    future = executor.submit(this::loop);
-                }
-            }
+            simulation.start();
+            resume();
         }
 
-        public void stop() {
-            if (future != null && !future.isCancelled() && !future.isDone()) {
-                future.cancel(true);
+        public boolean stop() {
+            if(state==State.RUNNING) {
+                state = State.STOPPED;
+                if (future != null) {
+                    future.cancel(false);
+                }
+                return true;
+            } else {
+                return false;
             }
         }
 
         void step() {
             try {
+                if(stepCount != 0) {
+                    if (stepCount > 0) {
+                        stepCount--;
+                    }
+                }
                 simulation.step();
+                if(stepCount == 0) {
+                    state = State.FINISHED;
+                    future.cancel(false);
+                    semaphore.release();
+                }
             } catch (Exception e) {
-                System.err.println("Error during simulation step: " + e.getMessage());
-                e.printStackTrace();
-                stop(); // Stop the simulation on error
+                exception = e;
+                state = State.ABORTED;
+                semaphore.release();
+                if(future != null) {
+                    future.cancel(false);
+                }
+                // TODO Add trace ?
             }
         }
 
         void loop() {
-            // If stepCount is >0, at least run 1 step and decrement count
-            // If stepCount is -1, we run indefinitely
-            while(stepCount != 0) {
-                if (Thread.currentThread().isInterrupted()) {
-                    break;
-                }
-                if(stepCount>0) {
-                    stepCount--;
-                }
-                step();
+            step();
+            if(state==State.RUNNING) {
+                executor.submit(this::loop);
             }
-        }
-
-        @Override
-        public boolean cancel(boolean mayInterruptIfRunning) {
-            return future != null && future.cancel(mayInterruptIfRunning);
-        }
-
-        @Override
-        public boolean isCancelled() {
-            return future != null && future.isCancelled();
-        }
-
-        @Override
-        public boolean isDone() {
-            return future != null && future.isDone();
-        }
-
-        @Override
-        public Void get() throws InterruptedException, ExecutionException {
-            if(future != null) {
-                future.get();
-            }
-            return null;
-        }
-
-        @Override
-        public Void get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-            if(future != null) {
-                future.get(timeout, unit);
-            }
-            return null;
-        }
-
-        @Override
-        public Throwable exceptionNow() {
-            if(future != null) {
-                return future.exceptionNow();
-            }
-            return null;
         }
 
         @Override
         public State state() {
-            if(future != null) {
-                return future.state();
-            }
-            return RUNNING;
+            return state;
         }
-    }
 
+        @Override
+        public SimulationState getSimulationState() {
+            return simulation.getSimulationState();
+        }
+
+        public Exception getException() {
+            return exception;
+        }
+
+        @Override
+        public boolean resume() {
+            if(state != State.RUNNING) {
+                exception = null;
+                state = State.RUNNING;
+                semaphore = new Semaphore(0);
+                if(stepRate > 0) {
+                    future = executor.scheduleAtFixedRate(this::step, stepRate, stepRate, stepTimeUnit);
+                } else {
+                    future = executor.submit(this::loop);
+                }
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        @Override
+        public boolean resume(int stepCount) {
+            if(state != State.RUNNING) {
+                exception = null;
+                state = State.RUNNING;
+                this.stepCount = stepCount;
+                semaphore = new Semaphore(0);
+                if(stepRate > 0) {
+                    future = executor.scheduleAtFixedRate(this::step, stepRate, stepRate, stepTimeUnit);
+                } else {
+                    future = executor.submit(this::loop);
+                }
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        @Override
+        public boolean restart(long stepCount) {
+            if(state!=State.RUNNING) {
+                exception = null;
+                this.stepCount = stepCount;
+                start();
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        public SimulationState get() throws ExecutionException, InterruptedException {
+            if(state==State.FINISHED) {
+                return simulation.getSimulationState();
+            }
+            if(state==State.ABORTED) {
+                throw new ExecutionException("An exception occurred during the simulation", exception);
+            }
+            if(future!=null) {
+                semaphore.acquire();
+                return simulation.getSimulationState();
+            } else {
+                throw new CancellationException("Simulation is not running or has not been started yet.");
+            }
+        }
+
+        @Override
+        public SimulationState get(long timeout, TimeUnit unit) throws ExecutionException, InterruptedException, TimeoutException {
+            if(state==State.FINISHED) {
+                return simulation.getSimulationState();
+            }
+            if(state==State.ABORTED) {
+                throw new ExecutionException("An exception occurred during the simulation", exception);
+            }
+            if(future!=null) {
+                if(semaphore.tryAcquire(timeout, unit)){
+                    return simulation.getSimulationState();
+                } else {
+                    throw new TimeoutException("Simulation did not finish in the given time.");
+                }
+            } else {
+                throw new CancellationException("Simulation is not running or has not been started yet.");
+            }
+        }
+
+    }
 
 
 
@@ -126,37 +191,35 @@ public class SimulationRunner {
 
     ScheduledExecutorService executor = new ScheduledThreadPoolExecutor(4);
 
-    public void stopSimulation(Simulation simulation) {
-        if(simulation != null && simulations.containsKey(simulation)) {
-            SimulationSession simuInfo = simulations.get(simulation);
-            simuInfo.stop();
-        }
-    }
 
-    public void stopSimulation(SimulationSession simulation) {
-        simulation.stop();
-    }
-
-
-    public SimulationSession startSimulation(Simulation simulation) {
+    public Session startSimulation(Simulation simulation) {
         return startSimulation(simulation, 0, TimeUnit.SECONDS, -1);
     }
 
-    public SimulationSession startSimulation(Simulation simulation, long stepCount) {
+    public Session startSimulation(Simulation simulation, long stepCount) {
         return startSimulation(simulation, 0, TimeUnit.SECONDS, stepCount);
     }
 
-    public SimulationSession startSimulation(Simulation simulation, long stepRate, TimeUnit stepTimeUnit) {
+    public Session startSimulation(Simulation simulation, long stepRate, TimeUnit stepTimeUnit) {
         return startSimulation(simulation, stepRate, stepTimeUnit, -1);
     }
 
-    public SimulationSession startSimulation(Simulation simulation, long stepRate, TimeUnit stepTimeUnit, long stepCount) {
-        SimulationSession simuInfo = new SimulationSession(simulation, stepRate, stepTimeUnit, stepCount);
-        simulations.put(simulation, simuInfo);
-        simuInfo.start();
-        return simuInfo;
+    public Session startSimulation(Simulation simulation, long stepRate, TimeUnit stepTimeUnit, long stepCount) {
+        if(simulation==null) {
+            throw new IllegalArgumentException("Simulation cannot be null");
+        }
+        SimulationSession session = new SimulationSession(simulation, stepRate, stepTimeUnit, stepCount);
+        simulations.put(simulation, session);
+        session.start();
+        return session;
     }
 
+    public void shutdown() {
+        executor.shutdownNow();
+    }
 
+    public boolean awaitTermination(long timeout, @NonNull TimeUnit unit) throws InterruptedException {
+        return executor.awaitTermination(timeout, unit);
+    }
 
 }

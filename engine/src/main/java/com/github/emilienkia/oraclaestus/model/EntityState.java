@@ -1,19 +1,26 @@
 package com.github.emilienkia.oraclaestus.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @Data
-public class State implements Cloneable{
+@NoArgsConstructor
+@AllArgsConstructor
+public class EntityState implements Cloneable {
 
     Map<Identifier, Object> values = new HashMap<>();
 
+
+
     @Override
-    public State clone() {
+    public EntityState clone() {
         try {
-            State clone = (State) super.clone();
+            EntityState clone = (EntityState) super.clone();
             clone.values = new HashMap<>(this.values);
             return clone;
         } catch (CloneNotSupportedException e) {

@@ -20,8 +20,8 @@ public class ModelEvaluationContext extends EvaluationContext {
     Model model;
     Entity entity;
 
-    State oldState;
-    State newState;
+    EntityState oldState;
+    EntityState newState;
 
     Logger logger;
 
