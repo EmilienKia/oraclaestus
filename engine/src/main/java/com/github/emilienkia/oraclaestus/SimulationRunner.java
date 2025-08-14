@@ -1,15 +1,10 @@
 package com.github.emilienkia.oraclaestus;
 
-import com.github.emilienkia.oraclaestus.model.Session;
-import com.github.emilienkia.oraclaestus.model.Simulation;
-import com.github.emilienkia.oraclaestus.model.SimulationState;
 import lombok.NonNull;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.*;
-
-import static java.util.concurrent.Future.State.RUNNING;
 
 public class SimulationRunner {
 

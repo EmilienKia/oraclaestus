@@ -1,12 +1,11 @@
 package com.github.emilienkia.oraclaestus;
 
-import com.github.emilienkia.oraclaestus.model.*;
-import com.github.emilienkia.oraclaestus.model.expressions.Addition;
-import com.github.emilienkia.oraclaestus.model.rules.Assignation;
-import com.github.emilienkia.oraclaestus.model.expressions.ReadValue;
-import com.github.emilienkia.oraclaestus.model.rules.RuleGroup;
-import com.github.emilienkia.oraclaestus.model.types.EnumerableType;
-import com.github.emilienkia.oraclaestus.model.variables.IntegerVariable;
+import com.github.emilienkia.oraclaestus.expressions.Addition;
+import com.github.emilienkia.oraclaestus.rules.Assignation;
+import com.github.emilienkia.oraclaestus.expressions.ReadValue;
+import com.github.emilienkia.oraclaestus.rules.RuleGroup;
+import com.github.emilienkia.oraclaestus.types.EnumerableType;
+import com.github.emilienkia.oraclaestus.variables.IntegerVariable;
 import nl.altindag.log.LogCaptor;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.Test;
@@ -69,7 +68,7 @@ rules {
 }
 """;
 
-        ModelParserHelper helper = new ModelParserHelper();
+        ModelParser helper = new ModelParser();
         Model model = helper.parseString(source);
 
         Simulation simulation = new Simulation(LocalDateTime.now(), Duration.ofSeconds(1));
@@ -109,7 +108,7 @@ rules {
 }
 """;
 
-        ModelParserHelper helper = new ModelParserHelper();
+        ModelParser helper = new ModelParser();
         Model model = helper.parseString(source);
 
         SimulationRunner simulationRunner = new SimulationRunner();
@@ -152,7 +151,7 @@ rules {
                 }
                 """;
 
-        ModelParserHelper helper = new ModelParserHelper();
+        ModelParser helper = new ModelParser();
         Model model = helper.parseString(source);
         assertThat(model).isNotNull();
 
@@ -194,7 +193,7 @@ rules {
                 }
                 """;
 
-        ModelParserHelper helper = new ModelParserHelper();
+        ModelParser helper = new ModelParser();
         Model model = helper.parseString(source);
 
         SimulationRunner simulationRunner = new SimulationRunner();
@@ -234,7 +233,7 @@ rules {
                 }
                 """;
 
-        ModelParserHelper helper = new ModelParserHelper();
+        ModelParser helper = new ModelParser();
         Model model = helper.parseString(source);
 
         SimulationRunner simulationRunner = new SimulationRunner();
@@ -285,7 +284,7 @@ rules {
                 }
                 """;
 
-        ModelParserHelper helper = new ModelParserHelper();
+        ModelParser helper = new ModelParser();
         Model model = helper.parseString(source);
 
         SimulationRunner simulationRunner = new SimulationRunner();

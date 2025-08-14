@@ -1,0 +1,55 @@
+package com.github.emilienkia.oraclaestus.contexts;
+
+import com.github.emilienkia.oraclaestus.Identifier;
+import com.github.emilienkia.oraclaestus.functions.Function;
+import com.github.emilienkia.oraclaestus.types.EnumerableType;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class EvaluationContext {
+
+    EvaluationContext parent = null;
+
+    public EnumerableType<?>.Instance getEnumerableValue(String name) {
+        return null;
+    }
+
+    public Object getMacroValue(Identifier name) {
+        return null;
+    }
+
+    public Function resolveFunction(Identifier name) {
+        if(parent != null) {
+            return parent.resolveFunction(name);
+        } else {
+            return null;
+        }
+    }
+    public Object getValue(Identifier name, boolean old) {
+        if(parent != null) {
+            return parent.getValue(name, old);
+        } else {
+            return null;
+        }
+    }
+
+    public void setValue(Identifier name, Object value) {
+        if(parent != null) {
+            parent.setValue(name, value);
+        }
+    }
+
+    public <CTX> CTX getContext(Class<CTX> contextClass) {
+        if (contextClass.isInstance(this)) {
+            return contextClass.cast(this);
+        } else if (parent != null) {
+            return parent.getContext(contextClass);
+        }
+        return null;
+    }
+
+}

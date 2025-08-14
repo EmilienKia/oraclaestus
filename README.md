@@ -34,7 +34,7 @@ First, you need to create a simulation runner.
 
 From the following package and its subpackages:
 ```java
-import com.github.emilienkia.oraclaestus.model.*;
+import com.github.emilienkia.oraclaestus.*;
 ```
 
 You must instantiate a `SimulationRunner` object, which is the main orchestrator of the simulator.
@@ -73,7 +73,7 @@ Next, you need to create a model for your entities.
 #### Loading a model from a file
 
 The easiest way to create a model is to load it from a file.
-You can create a model from a file by using the `ModelParserHelper` class.
+You can create a model from a file by using the `ModelParser` class.
 
 ```java
 ModelParserHelper helper = new ModelParserHelper();

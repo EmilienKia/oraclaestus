@@ -23,9 +23,9 @@ Entities have their own logger to which the messages are sent.
 
 The logger is on the form : `<logger-prefix>.<simulation-name>.<entity-id>`.
 
-The logger prefix is `com.github.emilienkia.oraclaestus.model.Simulation` by default,
+The logger prefix is `com.github.emilienkia.oraclaestus.Simulation` by default,
 but can be changed by calling `setLoggerPrefix(...)` before starting the simulation.
 
 For example, for a simulation called `simu-0001` and an entity `yoyo-test` :
-`com.github.emilienkia.oraclaestus.model.Simulation.simu-0001.yoyo-test`
+`com.github.emilienkia.oraclaestus.Simulation.simu-0001.yoyo-test`
 

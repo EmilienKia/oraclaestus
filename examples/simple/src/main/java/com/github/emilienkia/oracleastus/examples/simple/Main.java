@@ -1,9 +1,7 @@
 package com.github.emilienkia.oracleastus.examples.simple;
 
 
-import com.github.emilienkia.oraclaestus.ModelParserHelper;
-import com.github.emilienkia.oraclaestus.SimulationRunner;
-import com.github.emilienkia.oraclaestus.model.*;
+import com.github.emilienkia.oraclaestus.*;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -54,7 +52,7 @@ rules {
         SimulationRunner simulationRunner = new SimulationRunner();
 
         // Parse the model from the source string
-        ModelParserHelper helper = new ModelParserHelper();
+        ModelParser helper = new ModelParser();
         Model model = helper.parseString(SOURCE);
 
         Entity test = model.createEntity("test");
