@@ -5,14 +5,23 @@ import lombok.NonNull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class Identifier implements Comparable<Identifier> {
 
+    List<String> prefix = new ArrayList<String>();
+
     List<String> path = new ArrayList<String>();
 
-    transient String normalizedPath = null;
+    transient String normalized = null;
 
     public Identifier() {
+    }
+
+    public Identifier(List<String> prefix, List<String> path) {
+        this.prefix = prefix;
+        this.path = path;
+        // TODO check validity
     }
 
     public Identifier(List<String> path) {
@@ -38,7 +47,7 @@ public class Identifier implements Comparable<Identifier> {
     }
 
     public boolean isSimple() {
-        return path.size() == 1;
+        return prefix.size()==0 && path.size() == 1;
     }
 
     public String getLast() {
@@ -48,24 +57,65 @@ public class Identifier implements Comparable<Identifier> {
         return path.get(path.size() - 1);
     }
 
-    private void normalizePath() {
-        if(normalizedPath == null) {
-            normalizedPath = String.join(".", path);
+    public boolean hasPrefix() {
+        return !prefix.isEmpty();
+    }
+
+    public List<String> getPrefixAsList() {
+        return new ArrayList<>(prefix);
+    }
+
+    public String getPrefix() {
+        if (prefix.isEmpty()) {
+            return "";
+        }
+        return String.join(".", prefix);
+    }
+
+    public Identifier getPrefixAsIdentifier() {
+        return new Identifier(prefix);
+    }
+
+    public Identifier withoutPrefix() {
+        return new Identifier(path);
+    }
+
+    private void normalize() {
+        if(normalized == null) {
+            normalized = "";
+            if(!prefix.isEmpty()) {
+                normalized = String.join(".", prefix) + ":" + String.join(".", path);
+            } else {
+                normalized = String.join(".", path);
+            }
         }
     }
 
     public String toString() {
-        normalizePath();
-        return normalizedPath;
+        normalize();
+        return normalized;
     }
+
+    private static final Predicate<String> stringNotBlank = Predicate.not(String::isBlank);
 
     public static Identifier fromString(String identifier) {
         if (identifier == null || identifier.isBlank()) {
             return new Identifier();
         }
-        identifier = identifier.trim();
-        String[] parts = identifier.split("\\.");
-        return new Identifier(Arrays.asList(parts));
+
+        int pos = identifier.indexOf(':');
+        if( pos != -1) {
+            // Handle prefix
+            String prefixPart = identifier.substring(0, pos).trim();
+            String pathPart = identifier.substring(pos + 1).trim();
+            List<String> prefixList = Arrays.stream(prefixPart.split("\\.")).map(String::trim).filter(stringNotBlank).toList();
+            List<String> pathList = Arrays.stream(pathPart.split("\\.")).map(String::trim).filter(stringNotBlank).toList();
+            return new Identifier(prefixList, pathList);
+        } else {
+            identifier = identifier.trim();
+            List<String> pathList = Arrays.stream(identifier.split("\\.")).map(String::trim).filter(stringNotBlank).toList();
+            return new Identifier(pathList);
+        }
     }
 
     public int compareTo(String s) {
@@ -76,22 +126,31 @@ public class Identifier implements Comparable<Identifier> {
         return compareTo(fromString(s));
     }
 
-    @Override
-    public int compareTo(@NonNull Identifier o) {
-        if (o == null) {
-            // This is greater than null
-            return 1;
-        }
-        int minLength = Math.min(this.path.size(), o.path.size());
+    private static int compare(@NonNull List<String> ls1, @NonNull List<String> ls2) {
+        int minLength = Math.min(ls1.size(), ls2.size());
         for (int i = 0; i < minLength; i++) {
-            int cmp = this.path.get(i).compareTo(o.path.get(i));
+            int cmp = ls1.get(i).compareTo(ls2.get(i));
             if (cmp != 0) {
                 // Return the first non-equal comparison
                 return cmp;
             }
         }
         // Compare lengths if all previous elements are equal
-        return Integer.compare(this.path.size(), o.path.size());
+        return Integer.compare(ls1.size(), ls2.size());
+    }
+
+    @Override
+    public int compareTo(@NonNull Identifier o) {
+        if (o == null) {
+            // This is greater than null
+            return 1;
+        }
+
+        int comp = compare(this.prefix, o.prefix);
+        if (comp != 0) {
+            return comp;
+        }
+        return compare(this.path, o.path);
     }
 
     public boolean equals(String str) {
@@ -108,8 +167,8 @@ public class Identifier implements Comparable<Identifier> {
 
     @Override
     public int hashCode() {
-        normalizePath();
-        return normalizedPath.hashCode();
+        normalize();
+        return normalized.hashCode();
     }
 
 }

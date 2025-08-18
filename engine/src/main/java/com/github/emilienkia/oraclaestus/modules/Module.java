@@ -13,10 +13,23 @@ public class Module {
 
     Map<Identifier, Function> functions = new HashMap<>();
 
+    Map<Identifier, Object> constants = new HashMap<>();
+
     public Function getFunction(Identifier name) {
-        return functions.get(name);
+        return functions.get(name.withoutPrefix());
     }
 
+    public Object getConstant(Identifier name) {
+        return constants.get(name.withoutPrefix());
+    }
+
+    public void addConstant(String name, Object value) {
+        constants.put(Identifier.fromString(name).withoutPrefix(), value);
+    }
+
+    public void addConstant(Identifier name, Object value) {
+        constants.put(name.withoutPrefix(), value);
+    }
 
     public void addFunction(Function function) {
         functions.put(function.getName(), function);

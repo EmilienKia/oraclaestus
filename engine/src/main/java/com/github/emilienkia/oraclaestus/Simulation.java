@@ -80,6 +80,14 @@ public class Simulation {
         addModule(Identifier.fromString("log"), LogModule.getModule());
     }
 
+    public Module getModule(String name) {
+        return getModule(Identifier.fromString(name));
+    }
+
+    public Module getModule(Identifier name) {
+        return modules.get(name);
+    }
+
     public String addEntity(Entity entity) {
         entities.put(entity.getId(), entity);
         return entity.getId();

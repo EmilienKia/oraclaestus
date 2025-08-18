@@ -46,17 +46,29 @@ public class ModelEvaluationContext extends EvaluationContext {
 
     @Override
     public Function resolveFunction(Identifier name) {
-        if(model != null) {
+        if(!name.hasPrefix() &&  model != null) {
             Function function = model.getFunction(name);
             if(function != null) {
                 return function;
             }
         }
         if(simulation!=null) {
-            for(Module module : simulation.getModules().values()) {
-                Function function = module.getFunction(name);
-                if(function != null) {
-                    return function;
+            if(name.hasPrefix()) {
+                // Has a prefix, look at the module name based on the prefix
+                Module module = simulation.getModule(name.getPrefixAsIdentifier());
+                if(module!=null) {
+                    Function function = module.getFunction(name);
+                    if (function != null) {
+                        return function;
+                    }
+                }
+            } else {
+                // No prefix, iterate through modules to try to find a function with this name, as a last chance
+                for (Module module : simulation.getModules().values()) {
+                    Function function = module.getFunction(name);
+                    if (function != null) {
+                        return function;
+                    }
                 }
             }
         }
@@ -65,6 +77,14 @@ public class ModelEvaluationContext extends EvaluationContext {
 
     @Override
     public Object getValue(Identifier name, boolean old) {
+        if(name.hasPrefix() && simulation!=null) {
+            // Has a prefix, look at the module name based on the prefix
+            Module module = simulation.getModule(name.getPrefixAsIdentifier());
+            if(module!=null) {
+                return module.getConstant(name);
+            }
+            return null;
+        }
         if(old) {
             return getOldState().getValue(name);
         } else {

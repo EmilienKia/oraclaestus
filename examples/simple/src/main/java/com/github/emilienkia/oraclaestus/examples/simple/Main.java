@@ -1,4 +1,4 @@
-package com.github.emilienkia.oracleastus.examples.simple;
+package com.github.emilienkia.oraclaestus.examples.simple;
 
 
 import com.github.emilienkia.oraclaestus.*;

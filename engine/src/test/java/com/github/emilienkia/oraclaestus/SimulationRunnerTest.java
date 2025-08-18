@@ -2,8 +2,10 @@ package com.github.emilienkia.oraclaestus;
 
 import com.github.emilienkia.oraclaestus.expressions.Addition;
 import com.github.emilienkia.oraclaestus.expressions.Expression;
+import com.github.emilienkia.oraclaestus.expressions.FunctionCall;
 import com.github.emilienkia.oraclaestus.rules.Assignation;
 import com.github.emilienkia.oraclaestus.expressions.ReadValue;
+import com.github.emilienkia.oraclaestus.rules.Rule;
 import com.github.emilienkia.oraclaestus.rules.RuleGroup;
 import com.github.emilienkia.oraclaestus.types.EnumerableType;
 import com.github.emilienkia.oraclaestus.types.EnumerationType;
@@ -313,5 +315,103 @@ rules {
 
     }
 
+    @Test
+    void testFunctionWithModulePrefixExecution() throws IOException, ExecutionException, InterruptedException {
+
+        String source =
+                """
+                id: "test"
+                registers {
+                    i : int = 0
+                    j : int = 0
+                    m : int = 0
+                    n : int = 0
+                    p : float = 0.0
+                    q : float = 0.0
+                    pi : float = 28.4
+                }
+                functions {
+                    min (a: int, b: int) : int {
+                        return a + b
+                    }
+                }
+                rules {
+                    i = maths:abs(-42)
+                    j = abs(-128)
+                    m = maths:min(25, 32)
+                    n = min(25, 32)
+                    p = maths:pi
+                    q = pi
+                }
+                """;
+
+        ModelParser helper = new ModelParser();
+        Model model = helper.parseString(source);
+
+        SimulationRunner simulationRunner = new SimulationRunner();
+        Simulation simulation = new Simulation(LocalDateTime.now(), Duration.ofSeconds(1));
+        simulation.setLoggerPrefix("simulation");
+        simulation.setName("simu");
+        simulation.registerDefaultModules();
+        String id = simulation.addEntity(model.createEntity("test"));
+
+
+        assertThat(model.getRuleGroups()).hasSize(1);
+        RuleGroup ruleGroup = model.getRuleGroups().getFirst();
+        assertThat(ruleGroup).isNotNull();
+        assertThat(ruleGroup.getRules()).hasSize(6);
+
+        {
+            Rule rule = ruleGroup.getRules().getFirst();
+            assertThat(rule).isNotNull().isInstanceOf(Assignation.class);
+            Assignation assignation = (Assignation) rule;
+            assertThat(assignation.getVariableName()).isEqualTo("i");
+            assertThat(assignation.getExpression()).isNotNull().isInstanceOf(FunctionCall.class);
+            FunctionCall functionCall = (FunctionCall) assignation.getExpression();
+            assertThat(functionCall.getFunctionName()).isNotNull().isEqualTo("maths:abs");
+        }
+
+        {
+            Rule rule = ruleGroup.getRules().get(1);
+            assertThat(rule).isNotNull().isInstanceOf(Assignation.class);
+            Assignation assignation = (Assignation) rule;
+            assertThat(assignation.getVariableName()).isEqualTo("j");
+            assertThat(assignation.getExpression()).isNotNull().isInstanceOf(FunctionCall.class);
+            FunctionCall functionCall = (FunctionCall) assignation.getExpression();
+            assertThat(functionCall.getFunctionName()).isNotNull().isEqualTo("abs");
+        }
+
+
+        Session session = simulationRunner.startSimulation(simulation, 1);
+        session.get();
+        assertThat(session.getRemainingSteps()).isEqualTo(0);
+
+        EntityState state = simulation.getCurrentState(id);
+        assertThat(state).isNotNull();
+
+        assertThat(state.getValue("i")).isNotNull().isInstanceOf(Long.class)
+                .asInstanceOf(InstanceOfAssertFactories.LONG)
+                .isEqualTo(42L);
+
+        assertThat(state.getValue("j")).isNotNull().isInstanceOf(Long.class)
+                .asInstanceOf(InstanceOfAssertFactories.LONG)
+                .isEqualTo(128L);
+
+        assertThat(state.getValue("m")).isNotNull().isInstanceOf(Long.class)
+                .asInstanceOf(InstanceOfAssertFactories.LONG)
+                .isEqualTo(25L);
+
+        assertThat(state.getValue("n")).isNotNull().isInstanceOf(Long.class)
+                .asInstanceOf(InstanceOfAssertFactories.LONG)
+                .isEqualTo(25L + 32L);
+
+        assertThat(state.getValue("p")).isNotNull().isInstanceOf(Double.class)
+                .asInstanceOf(InstanceOfAssertFactories.DOUBLE)
+                .isCloseTo(Math.PI, offset(0.0001));
+
+        assertThat(state.getValue("q")).isNotNull().isInstanceOf(Double.class)
+                .asInstanceOf(InstanceOfAssertFactories.DOUBLE)
+                .isCloseTo(28.4, offset(0.0001));
+    }
 
 }

@@ -61,9 +61,15 @@ public class RuleGroup implements Rule {
 
         @Override
         public Object getValue(Identifier name, boolean old) {
-            Variable<?> variable = variables.get(name);
-            if (variable != null) {
-                return values.get(name);
+            if(!name.hasPrefix()) {
+                // Rule group local have not prefix
+                Variable<?> variable = variables.get(name);
+                if (variable != null) {
+                    if(old) {
+                        // TODO Log a warning, old values are for entity's registers only
+                    }
+                    return values.get(name);
+                }
             }
             return super.getValue(name, old);
         }

@@ -17,6 +17,10 @@ public class MathsModule extends Module {
 
     private MathsModule() {
 
+        addConstant("pi", Math.PI);
+        addConstant("e", Math.E);
+        addConstant("tau", Math.TAU);
+
         addNumberToNumberFunction("abs", "value", MathsModule::abs);
 
         add2NumbersToNumbersFunction("rand", "min", "max", MathsModule::rand);
@@ -71,7 +75,6 @@ public class MathsModule extends Module {
         }
         throw new IllegalArgumentException("Unsupported number type: " + number.getClass().getName());
     }
-
 
 
 

@@ -137,7 +137,7 @@ value
 
 metadata_value : BOOLEAN | STRING | NUMBER | ID ;
 
-identifier : ID ('.' ID)* ;
+identifier : (ID ('.' ID)* ':' )? ID ('.' ID)* ;
 
 ID : [a-zA-Z_][a-zA-Z0-9_]* ;
 

@@ -53,8 +53,14 @@ public class RuleGroupFunction extends Function implements Dumpable {
 
         @Override
         public Object getValue(Identifier name, boolean old) {
-            if (values.containsKey(name)) {
-                return values.get(name);
+            if(!name.hasPrefix()) {
+                // Function local have not prefix
+                if (values.containsKey(name)) {
+                    if(old) {
+                        // TODO Log a warning, old values are for entity's registers only
+                    }
+                    return values.get(name);
+                }
             }
             return super.getValue(name, old);
         }
