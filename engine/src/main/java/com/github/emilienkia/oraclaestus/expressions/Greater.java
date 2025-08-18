@@ -20,12 +20,12 @@ public class Greater implements Expression {
         if (leftValue == null || rightValue == null) return false;
 
         return switch (leftValue) {
-            case Integer leftInt -> {
+            case Long leftInt -> {
                 switch (rightValue) {
-                    case Integer rightInt -> {
+                    case Long rightInt -> {
                         yield leftInt > rightInt;
                     }
-                    case Float rightFloat -> {
+                    case Double rightFloat -> {
                         yield leftInt > rightFloat;
                     }
                     default -> {
@@ -33,12 +33,12 @@ public class Greater implements Expression {
                     }
                 }
             }
-            case Float leftFloat -> {
+            case Double leftFloat -> {
                 switch (rightValue) {
-                    case Integer rightInt -> {
+                    case Long rightInt -> {
                         yield leftFloat > rightInt;
                     }
-                    case Float rightFloat -> {
+                    case Double rightFloat -> {
                         yield leftFloat > rightFloat;
                     }
                     default -> {

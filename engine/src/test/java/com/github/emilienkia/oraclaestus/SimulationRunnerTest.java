@@ -11,6 +11,7 @@ import com.github.emilienkia.oraclaestus.variables.IntegerVariable;
 import com.github.emilienkia.oraclaestus.variables.Variable;
 import nl.altindag.log.LogCaptor;
 import org.assertj.core.api.InstanceOfAssertFactories;
+import org.assertj.core.data.Percentage;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -81,10 +82,12 @@ rules {
 
         EntityState state = simulation.getCurrentState(id);
         assertThat(state).isNotNull();
-        assertThat(state.getValue("i")).isNotNull().isInstanceOf(Integer.class).isEqualTo(42);
+        assertThat(state.getValue("i")).isNotNull().isInstanceOf(Long.class).isEqualTo(42L);
         assertThat(state.getValue("s")).isNotNull().isInstanceOf(String.class).isEqualTo("test");
         assertThat(state.getValue("b")).isNotNull().isInstanceOf(Boolean.class).isEqualTo(true);
-        assertThat(state.getValue("f")).isNotNull().isInstanceOf(Float.class).isEqualTo(3.14f);
+        assertThat(state.getValue("f")).isNotNull().isInstanceOf(Double.class)
+                .asInstanceOf(InstanceOfAssertFactories.DOUBLE)
+                .isCloseTo(3.14, offset(0.0001));
 
     }
 
@@ -125,10 +128,10 @@ rules {
 
         EntityState state = simulation.getCurrentState(id);
         assertThat(state).isNotNull();
-        assertThat(state.getValue("i")).isNotNull().isInstanceOf(Integer.class).isEqualTo(42);
+        assertThat(state.getValue("i")).isNotNull().isInstanceOf(Long.class).isEqualTo(42L);
         assertThat(state.getValue("s")).isNotNull().isInstanceOf(String.class).isEqualTo("test");
         assertThat(state.getValue("b")).isNotNull().isInstanceOf(Boolean.class).isEqualTo(true);
-        assertThat(state.getValue("f")).isNotNull().isInstanceOf(Float.class).isEqualTo(3.14f);
+        assertThat(state.getValue("f")).isNotNull().isInstanceOf(Double.class).isEqualTo(3.14);
     }
 
 
@@ -210,7 +213,7 @@ rules {
 
         EntityState state = simulation.getCurrentState(id);
         assertThat(state).isNotNull();
-        assertThat(state.getValue("i")).isNotNull().isInstanceOf(Integer.class).isEqualTo(13);
+        assertThat(state.getValue("i")).isNotNull().isInstanceOf(Long.class).isEqualTo(13L);
     }
 
     @Test
@@ -251,26 +254,26 @@ rules {
 
         EntityState state = simulation.getCurrentState(id);
         assertThat(state).isNotNull();
-        assertThat(state.getValue("f")).isNotNull().isInstanceOf(Float.class)
-                .asInstanceOf(InstanceOfAssertFactories.FLOAT)
-                .isCloseTo(0.0f, offset(0.0001f));
-        assertThat(state.getValue("g")).isNotNull().isInstanceOf(Float.class)
-                .asInstanceOf(InstanceOfAssertFactories.FLOAT)
-                .isCloseTo(-1.0f, offset(0.0001f));
+        assertThat(state.getValue("f")).isNotNull().isInstanceOf(Double.class)
+                .asInstanceOf(InstanceOfAssertFactories.DOUBLE)
+                .isCloseTo(0.0, offset(0.0001));
+        assertThat(state.getValue("g")).isNotNull().isInstanceOf(Double.class)
+                .asInstanceOf(InstanceOfAssertFactories.DOUBLE)
+                .isCloseTo(-1.0, offset(0.0001));
 
-        assertThat(state.getValue("r")).isNotNull().isInstanceOf(Float.class)
-                .asInstanceOf(InstanceOfAssertFactories.FLOAT)
-                .isGreaterThanOrEqualTo(50.0f)
-                .isLessThanOrEqualTo(100.0f);
+        assertThat(state.getValue("r")).isNotNull().isInstanceOf(Double.class)
+                .asInstanceOf(InstanceOfAssertFactories.DOUBLE)
+                .isGreaterThanOrEqualTo(50.0)
+                .isLessThanOrEqualTo(100.0);
 
-        assertThat(state.getValue("r2")).isNotNull().isInstanceOf(Integer.class)
-                .asInstanceOf(InstanceOfAssertFactories.INTEGER)
-                .isGreaterThanOrEqualTo(50)
-                .isLessThanOrEqualTo(100);
+        assertThat(state.getValue("r2")).isNotNull().isInstanceOf(Long.class)
+                .asInstanceOf(InstanceOfAssertFactories.LONG)
+                .isGreaterThanOrEqualTo(50L)
+                .isLessThanOrEqualTo(100L);
 
-        assertThat(state.getValue("r3")).isNotNull().isInstanceOf(Integer.class)
-                .asInstanceOf(InstanceOfAssertFactories.INTEGER)
-                .isEqualTo(42);
+        assertThat(state.getValue("r3")).isNotNull().isInstanceOf(Long.class)
+                .asInstanceOf(InstanceOfAssertFactories.LONG)
+                .isEqualTo(42L);
 
     }
 

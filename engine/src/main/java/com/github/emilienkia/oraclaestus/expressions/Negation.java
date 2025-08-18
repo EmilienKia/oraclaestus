@@ -15,8 +15,8 @@ public class Negation implements Expression{
         Object value = expression.apply(context);
         return switch(value) {
             case Boolean bool -> !bool;
-            case Integer num -> -num;
-            case Float num -> -num;
+            case Long num -> -num;
+            case Double num -> -num;
             default -> null;
         };
     }

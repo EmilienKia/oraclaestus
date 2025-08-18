@@ -47,64 +47,64 @@ public class Module {
     }
 
 
-    public void addFloatToFloatFunction(String name, String paramName, java.util.function.Function<Float,Float> function) {
-        addFunction(name, Float.class, paramName, Float.class, null, function);
+    public void addFloatToFloatFunction(String name, String paramName, java.util.function.Function<Double,Double> function) {
+        addFunction(name, Double.class, paramName, Double.class, null, function);
     }
 
-    public void addFloatToFloatFunction(String name, String paramName, Float defValue, java.util.function.Function<Float,Float> function) {
-        addFunction(name, Float.class, paramName, Float.class, defValue, function);
+    public void addFloatToFloatFunction(String name, String paramName, Double defValue, java.util.function.Function<Double,Double> function) {
+        addFunction(name, Double.class, paramName, Double.class, defValue, function);
     }
 
-    public void add2FloatsToFloatFunction(String name, String paramName1, String paramName2, java.util.function.BiFunction<Float,Float,Float> function) {
-        addFunction(name, Float.class, paramName1, Float.class, null, paramName2, Float.class, null, function);
+    public void add2FloatsToFloatFunction(String name, String paramName1, String paramName2, java.util.function.BiFunction<Double,Double,Double> function) {
+        addFunction(name, Double.class, paramName1, Double.class, null, paramName2, Double.class, null, function);
     }
 
-    public void add2FloatsToFloatFunction(String name, String paramName1, Float defValue1, String paramName2, Float defValue2, java.util.function.BiFunction<Float,Float,Float> function) {
-        addFunction(name, Float.class, paramName1, Float.class, defValue1, paramName2, Float.class, defValue2, function);
+    public void add2FloatsToFloatFunction(String name, String paramName1, Double defValue1, String paramName2, Double defValue2, java.util.function.BiFunction<Double,Double,Double> function) {
+        addFunction(name, Double.class, paramName1, Double.class, defValue1, paramName2, Double.class, defValue2, function);
     }
 
-    public void add3FloatsToFloatFunction(String name, String paramName1, String paramName2, String paramName3, TriFunction<Float,Float,Float,Float> function) {
-        addFunction(name, Float.class, paramName1, Float.class, null, paramName2, Float.class, null, paramName3, Float.class, null, function);
+    public void add3FloatsToFloatFunction(String name, String paramName1, String paramName2, String paramName3, TriFunction<Double,Double,Double,Double> function) {
+        addFunction(name, Double.class, paramName1, Double.class, null, paramName2, Double.class, null, paramName3, Double.class, null, function);
     }
 
-    public void add3FloatsToFloatFunction(String name, String paramName1, Float defValue1, String paramName2, Float defValue2, String paramName3, Float defValue3 , TriFunction<Float,Float,Float,Float> function) {
-        addFunction(name, Float.class, paramName1, Float.class, defValue1, paramName2, Float.class, defValue2, paramName3, Float.class, defValue3, function);
-    }
-
-
-
-    public void addIntegerToIntegerFunction(String name, String paramName, java.util.function.Function<Integer,Integer> function) {
-        addFunction(name, Integer.class, paramName, Integer.class, null, function);
-    }
-
-    public void addIntegerToIntegerFunction(String name, String paramName, Integer defValue, java.util.function.Function<Integer,Integer> function) {
-        addFunction(name, Integer.class, paramName, Integer.class, defValue, function);
-    }
-
-    public void add2IntegersToIntegerFunction(String name, String paramName1, String paramName2, java.util.function.BiFunction<Integer,Integer,Integer> function) {
-        addFunction(name, Integer.class, paramName1, Integer.class, null, paramName2, Integer.class, null, function);
-    }
-
-    public void add2IntegersToIntegerFunction(String name, String paramName1, Integer defValue1, String paramName2, Integer defValue2, java.util.function.BiFunction<Integer,Integer,Integer> function) {
-        addFunction(name, Integer.class, paramName1, Integer.class, defValue1, paramName2, Integer.class, defValue2, function);
-    }
-
-    public void add3IntegersToIntegerFunction(String name, String paramName1, String paramName2, String paramName3, TriFunction<Integer,Integer,Integer,Integer> function) {
-        addFunction(name, Integer.class, paramName1, Integer.class, null, paramName2, Integer.class, null, paramName3, Integer.class, null, function);
-    }
-
-    public void add3IntegersToIntegerFunction(String name, String paramName1, Integer defValue1, String paramName2, Integer defValue2, String paramName3, Integer defValue3 , TriFunction<Integer,Integer,Integer,Integer> function) {
-        addFunction(name, Integer.class, paramName1, Integer.class, defValue1, paramName2, Integer.class, defValue2, paramName3, Integer.class, defValue3, function);
+    public void add3FloatsToFloatFunction(String name, String paramName1, Double defValue1, String paramName2, Double defValue2, String paramName3, Double defValue3 , TriFunction<Double,Double,Double,Double> function) {
+        addFunction(name, Double.class, paramName1, Double.class, defValue1, paramName2, Double.class, defValue2, paramName3, Double.class, defValue3, function);
     }
 
 
 
-    public void addFloatToIntegerFunction(String name, String paramName, java.util.function.Function<Float,Integer> function) {
-        addFunction(name, Integer.class, paramName, Float.class, null, function);
+    public void addIntegerToIntegerFunction(String name, String paramName, java.util.function.Function<Long,Long> function) {
+        addFunction(name, Long.class, paramName, Long.class, null, function);
     }
 
-    public void addFloatToIntegerFunction(String name, String paramName, Float defValue, java.util.function.Function<Float,Integer> function) {
-        addFunction(name, Integer.class, paramName, Float.class, defValue, function);
+    public void addIntegerToIntegerFunction(String name, String paramName, Long defValue, java.util.function.Function<Long,Long> function) {
+        addFunction(name, Long.class, paramName, Long.class, defValue, function);
+    }
+
+    public void add2IntegersToIntegerFunction(String name, String paramName1, String paramName2, java.util.function.BiFunction<Long,Long,Long> function) {
+        addFunction(name, Long.class, paramName1, Long.class, null, paramName2, Long.class, null, function);
+    }
+
+    public void add2IntegersToIntegerFunction(String name, String paramName1, Long defValue1, String paramName2, Long defValue2, java.util.function.BiFunction<Long,Long,Long> function) {
+        addFunction(name, Long.class, paramName1, Long.class, defValue1, paramName2, Long.class, defValue2, function);
+    }
+
+    public void add3IntegersToIntegerFunction(String name, String paramName1, String paramName2, String paramName3, TriFunction<Long,Long,Long,Long> function) {
+        addFunction(name, Long.class, paramName1, Long.class, null, paramName2, Long.class, null, paramName3, Long.class, null, function);
+    }
+
+    public void add3IntegersToIntegerFunction(String name, String paramName1, Long defValue1, String paramName2, Long defValue2, String paramName3, Long defValue3 , TriFunction<Long,Long,Long,Long> function) {
+        addFunction(name, Long.class, paramName1, Long.class, defValue1, paramName2, Long.class, defValue2, paramName3, Long.class, defValue3, function);
+    }
+
+
+
+    public void addFloatToIntegerFunction(String name, String paramName, java.util.function.Function<Double,Long> function) {
+        addFunction(name, Long.class, paramName, Double.class, null, function);
+    }
+
+    public void addFloatToIntegerFunction(String name, String paramName, Double defValue, java.util.function.Function<Double,Long> function) {
+        addFunction(name, Long.class, paramName, Double.class, defValue, function);
     }
 
 

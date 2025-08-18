@@ -21,12 +21,12 @@ public class Equal implements Expression {
         if (leftValue == null || rightValue == null) return false;
 
         return switch (leftValue) {
-            case Integer leftInt -> {
+            case Long leftInt -> {
                 switch (rightValue) {
-                    case Integer rightInt -> {
+                    case Long rightInt -> {
                         yield leftInt.equals(rightInt);
                     }
-                    case Float rightFloat -> {
+                    case Double rightFloat -> {
                         yield leftInt.floatValue() == rightFloat;
                     }
                     default -> {
@@ -34,12 +34,12 @@ public class Equal implements Expression {
                     }
                 }
             }
-            case Float leftFloat -> {
+            case Double leftFloat -> {
                 switch (rightValue) {
-                    case Integer rightInt -> {
+                    case Long rightInt -> {
                         yield leftFloat == rightInt.floatValue();
                     }
-                    case Float rightFloat -> {
+                    case Double rightFloat -> {
                         yield leftFloat.equals(rightFloat);
                     }
                     default -> {
@@ -67,9 +67,7 @@ public class Equal implements Expression {
                     }
                 }
             }
-            default -> {
-                yield leftValue.equals(rightValue);
-            }
+            default -> leftValue.equals(rightValue);
         };
     }
 

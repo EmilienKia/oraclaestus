@@ -69,7 +69,7 @@ rules {
             Variable<?> s = model.getRegister("i");
             assertThat(s).isNotNull();
             assertThat(s.getType()).isEqualTo(Type.INTEGER);
-            assertThat(s.getDefaultValue()).isNotNull().isInstanceOf(Integer.class).isEqualTo(42);
+            assertThat(s.getDefaultValue()).isNotNull().isInstanceOf(Long.class).isEqualTo(42L);
         }
     }
 
@@ -155,7 +155,7 @@ rules {
             Variable<?> var = model.getRegister("i");
             assertThat(var).isNotNull();
             assertThat(var.getType()).isEqualTo(Type.INTEGER);
-            assertThat(var.getDefaultValue()).isNotNull().isInstanceOf(Integer.class).isEqualTo(42);
+            assertThat(var.getDefaultValue()).isNotNull().isInstanceOf(Long.class).isEqualTo(42L);
         }
 
         {
@@ -227,7 +227,7 @@ rules {
             assertThat(left.getIdentifier()).isEqualTo("t.t");
             assertThat(addition.getRightExpression()).isNotNull().isInstanceOf(ConstValue.class);
             ConstValue right = (ConstValue) addition.getRightExpression();
-            assertThat(right.getValue()).isEqualTo(1);
+            assertThat(right.getValue()).isEqualTo(1L);
         }
 
     }
@@ -487,7 +487,7 @@ rules {
             Variable<?> paramB = function.getParameters().get(1);
             assertThat(paramB.getName()).isEqualTo("b");
             assertThat(paramB.getType()).isEqualTo(Type.INTEGER);
-            assertThat(paramB.getDefaultValue()).isNotNull().isInstanceOf(Integer.class).isEqualTo(0);
+            assertThat(paramB.getDefaultValue()).isNotNull().isInstanceOf(Long.class).isEqualTo(0L);
 
             assertThat(function.getReturnType()).isNotNull();
             assertThat(function.getReturnType().getType()).isEqualTo(Type.INTEGER);
@@ -542,11 +542,11 @@ rules {
 
             assertThat(functionCall.getArguments().get(0)).isNotNull().isInstanceOf(ConstValue.class);
             ConstValue arg1 = (ConstValue) functionCall.getArguments().get(0);
-            assertThat(arg1.getValue()).isEqualTo(2);
+            assertThat(arg1.getValue()).isEqualTo(2L);
 
             assertThat(functionCall.getArguments().get(1)).isNotNull().isInstanceOf(ConstValue.class);
             ConstValue arg2 = (ConstValue) functionCall.getArguments().get(1);
-            assertThat(arg2.getValue()).isEqualTo(5);
+            assertThat(arg2.getValue()).isEqualTo(5L);
         }
 
         {
@@ -562,11 +562,11 @@ rules {
 
             assertThat(functionCall.getArguments().get(0)).isNotNull().isInstanceOf(ConstValue.class);
             ConstValue arg1 = (ConstValue) functionCall.getArguments().get(0);
-            assertThat(arg1.getValue()).isEqualTo(4);
+            assertThat(arg1.getValue()).isEqualTo(4L);
 
             assertThat(functionCall.getArguments().get(1)).isNotNull().isInstanceOf(ConstValue.class);
             ConstValue arg2 = (ConstValue) functionCall.getArguments().get(1);
-            assertThat(arg2.getValue()).isEqualTo(8);
+            assertThat(arg2.getValue()).isEqualTo(8L);
         }
 
     }

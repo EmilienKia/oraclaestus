@@ -1,6 +1,6 @@
 package com.github.emilienkia.oraclaestus.types;
 
-public class IntegerType extends NumberType<Integer> {
+public class IntegerType extends NumberType<Long> {
 
     static final IntegerType INSTANCE = new IntegerType();
 
@@ -12,26 +12,26 @@ public class IntegerType extends NumberType<Integer> {
     }
 
     @Override
-    public Integer cast(Object value) {
+    public Long cast(Object value) {
         switch(value) {
             case null:
                 return null;
             case Integer i:
-                return i;
+                return i.longValue();
             case Long l:
-                return l.intValue();
+                return l;
             case Double d:
-                return d.intValue();
+                return d.longValue();
             case Float f:
-                return f.intValue();
+                return f.longValue();
             case String str:
                 try {
-                    return Integer.parseInt(str);
+                    return Long.parseLong(str);
                 } catch (NumberFormatException e) {
                     throw new IllegalArgumentException("Cannot convert String to Integer: " + value, e);
                 }
             case Boolean b:
-                return b ? 1 : 0; // Convert Boolean to Integer (true -> 1, false -> 0)
+                return b ? 1L : 0L; // Convert Boolean to Integer (true -> 1, false -> 0)
             default:
                 throw new IllegalArgumentException("Cannot convert " + value.getClass().getName() + " to Integer");
         }

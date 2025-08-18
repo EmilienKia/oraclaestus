@@ -27,9 +27,9 @@ public class ConstValue implements Expression {
             return null;
         }
         if(str.contains(".")) {
-            return Float.parseFloat(str);
+            return Double.parseDouble(str);
         } else {
-            return Integer.parseInt(str);
+            return Long.parseLong(str);
         }
     }
 
