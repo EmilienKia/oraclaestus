@@ -7,9 +7,6 @@ import com.github.emilienkia.oraclaestus.types.TypeDescriptor;
 
 public class FloatVariable extends Variable<Float> {
 
-    public FloatVariable() {
-    }
-
     public FloatVariable(String name, Float defaultValue) {
         super(Identifier.fromString(name), defaultValue);
     }
@@ -24,6 +21,6 @@ public class FloatVariable extends Variable<Float> {
     }
 
     public TypeDescriptor<Float> getTypeDescriptor() {
-        return new FloatType();
+        return FloatType.get();
     }
 }

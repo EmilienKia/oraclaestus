@@ -1,11 +1,14 @@
 package com.github.emilienkia.oraclaestus;
 
 import com.github.emilienkia.oraclaestus.expressions.Addition;
+import com.github.emilienkia.oraclaestus.expressions.Expression;
 import com.github.emilienkia.oraclaestus.rules.Assignation;
 import com.github.emilienkia.oraclaestus.expressions.ReadValue;
 import com.github.emilienkia.oraclaestus.rules.RuleGroup;
 import com.github.emilienkia.oraclaestus.types.EnumerableType;
+import com.github.emilienkia.oraclaestus.types.EnumerationType;
 import com.github.emilienkia.oraclaestus.variables.IntegerVariable;
+import com.github.emilienkia.oraclaestus.variables.Variable;
 import nl.altindag.log.LogCaptor;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.Test;
@@ -306,5 +309,6 @@ rules {
         assertThat(logCaptor.getWarnLogs()).contains("This is warning message !!");
 
     }
+
 
 }

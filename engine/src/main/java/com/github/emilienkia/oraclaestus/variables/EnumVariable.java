@@ -7,15 +7,16 @@ import com.github.emilienkia.oraclaestus.types.TypeDescriptor;
 
 public class EnumVariable  extends Variable<EnumerationType.Instance> {
 
-    public EnumVariable() {
-    }
+    EnumerationType enumType;
 
     public EnumVariable(Identifier name, EnumerationType.Instance defaultValue) {
         super(name, defaultValue);
+        this.enumType = defaultValue.getEnumerationType();
     }
 
     public EnumVariable(Identifier name, EnumerationType enumeration, String defaultValue) {
-        super(name, enumeration.cast(defaultValue));
+        super(name, enumeration.get(defaultValue));
+        this.enumType = enumeration;
     }
 
     @Override
@@ -24,6 +25,6 @@ public class EnumVariable  extends Variable<EnumerationType.Instance> {
     }
 
     public TypeDescriptor<EnumerationType.Instance> getTypeDescriptor() {
-        return new EnumerationType();
+        return enumType;
     }
 }

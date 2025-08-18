@@ -7,9 +7,6 @@ import com.github.emilienkia.oraclaestus.types.TypeDescriptor;
 
 public class IntegerVariable extends Variable<Integer> {
 
-    public IntegerVariable() {
-    }
-
     public IntegerVariable(String name, Integer defaultValue) {
         super(new Identifier(name), defaultValue);
     }
@@ -25,6 +22,6 @@ public class IntegerVariable extends Variable<Integer> {
     }
 
     public TypeDescriptor<Integer> getTypeDescriptor() {
-        return new IntegerType();
+        return IntegerType.get();
     }
 }

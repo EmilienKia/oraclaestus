@@ -2,6 +2,15 @@ package com.github.emilienkia.oraclaestus.types;
 
 public class FloatType extends NumberType<Float> {
 
+    static final FloatType INSTANCE = new FloatType();
+
+    private FloatType() {
+    }
+
+    public static FloatType get() {
+        return INSTANCE;
+    }
+
     @Override
     public Float cast(Object value) {
         switch(value) {

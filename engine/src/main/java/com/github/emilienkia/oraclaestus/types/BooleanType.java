@@ -2,6 +2,15 @@ package com.github.emilienkia.oraclaestus.types;
 
 public class BooleanType implements TypeDescriptor<Boolean> {
 
+    static final BooleanType INSTANCE = new BooleanType();
+
+    private BooleanType() {
+    }
+
+    public static BooleanType get() {
+        return INSTANCE;
+    }
+
     @Override
     public Boolean cast(Object value) {
         switch(value) {

@@ -8,11 +8,16 @@ import com.github.emilienkia.oraclaestus.rules.*;
 import com.github.emilienkia.oraclaestus.types.EnumerationType;
 import com.github.emilienkia.oraclaestus.types.Type;
 import com.github.emilienkia.oraclaestus.variables.Variable;
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.concurrent.ExecutionException;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.AssertionsForClassTypes.offset;
 
 class ModelParserTest {
 
@@ -162,9 +167,9 @@ rules {
             EnumerationType type = enumValue.getEnumerationType() ;
             assertThat(type).isNotNull();
             assertThat(type.getCount()).isEqualTo(3);
-            assertThat(type.getValue("RED")).isEqualTo(0);
-            assertThat(type.getValue("GREEN")).isEqualTo(1);
-            assertThat(type.getValue("BLUE")).isEqualTo(2);
+            assertThat(type.get("RED").getValue()).isEqualTo(0);
+            assertThat(type.get("GREEN").getValue()).isEqualTo(1);
+            assertThat(type.get("BLUE").getValue()).isEqualTo(2);
             assertThat(enumValue.getValue()).isEqualTo(1); // GREEN
             // TODO Add enum declaration check
         }
@@ -185,9 +190,9 @@ rules {
             EnumerationType type = stateValue.getEnumerationType() ;
             assertThat(type).isNotNull();
             assertThat(type.getCount()).isEqualTo(3);
-            assertThat(type.getValue("ON")).isEqualTo(0);
-            assertThat(type.getValue("OFF")).isEqualTo(1);
-            assertThat(type.getValue("UNKNOWN")).isEqualTo(2);
+            assertThat(type.get("ON").getValue()).isEqualTo(0);
+            assertThat(type.get("OFF").getValue()).isEqualTo(1);
+            assertThat(type.get("UNKNOWN").getValue()).isEqualTo(2);
             assertThat(stateValue.getValue()).isEqualTo(0); // ON
 
         }
@@ -258,9 +263,9 @@ rules {
             assertThat(model.getCustomTypes().get("color")).isNotNull().isInstanceOf(EnumerationType.class);
             EnumerationType colorType = (EnumerationType) model.getCustomTypes().get("color");
             assertThat(colorType.getCount()).isEqualTo(3);
-            assertThat(colorType.getValue("RED")).isEqualTo(0);
-            assertThat(colorType.getValue("GREEN")).isEqualTo(1);
-            assertThat(colorType.getValue("BLUE")).isEqualTo(2);
+            assertThat(colorType.get("RED").getValue()).isEqualTo(0);
+            assertThat(colorType.get("GREEN").getValue()).isEqualTo(1);
+            assertThat(colorType.get("BLUE").getValue()).isEqualTo(2);
         }
 
         assertThat(model.getRegisters()).hasSize(1);
@@ -273,9 +278,9 @@ rules {
             EnumerationType type = enumValue.getEnumerationType() ;
             assertThat(type).isNotNull();
             assertThat(type.getCount()).isEqualTo(3);
-            assertThat(type.getValue("RED")).isEqualTo(0);
-            assertThat(type.getValue("GREEN")).isEqualTo(1);
-            assertThat(type.getValue("BLUE")).isEqualTo(2);
+            assertThat(type.get("RED").getValue()).isEqualTo(0);
+            assertThat(type.get("GREEN").getValue()).isEqualTo(1);
+            assertThat(type.get("BLUE").getValue()).isEqualTo(2);
             assertThat(enumValue.getValue()).isEqualTo(0); // RED
         }
 
@@ -565,4 +570,121 @@ rules {
         }
 
     }
+
+
+
+    @Test
+    void testEnumNameResolution() throws IOException, ExecutionException, InterruptedException {
+
+        String source =
+                """
+                types {
+                    enum One {
+                        ON,
+                        OFF
+                    }
+                    enum Two {
+                        OFF,
+                        ON
+                    }
+                }
+                
+                registers {
+                    o1: One = ON
+                    o2: Two = OFF
+                }
+                
+                rules {
+                    o1 = One.OFF
+                    o2 = Two.ON
+                }
+                """;
+
+        ModelParser helper = new ModelParser();
+        Model model = helper.parseString(source);
+
+        assertThat(model.getEnumerations().size()).isEqualTo(2);
+
+        EnumerationType one = model.getEnumeration("One");
+        {
+            assertThat(one).isNotNull();
+            assertThat(one.getCount()).isEqualTo(2);
+            assertThat(one.get("ON").getValue()).isEqualTo(0);
+            assertThat(one.get("OFF").getValue()).isEqualTo(1);
+        }
+
+        EnumerationType two = model.getEnumeration("Two");
+        {
+            assertThat(two).isNotNull();
+            assertThat(two.getCount()).isEqualTo(2);
+            assertThat(two.get("OFF").getValue()).isEqualTo(0);
+            assertThat(two.get("ON").getValue()).isEqualTo(1);
+        }
+
+        assertThat(model.getRegisters().size()).isEqualTo(2);
+
+        Variable<?> o1 = model.getRegister("o1");
+        {
+            assertThat(o1).isNotNull();
+            assertThat(o1.getTypeDescriptor()).isInstanceOf(EnumerationType.class).isEqualTo(one);
+            Object defaultValue = o1.getDefaultValue();
+            assertThat(defaultValue).isNotNull().isInstanceOf(EnumerationType.Instance.class);
+            EnumerationType.Instance value = (EnumerationType.Instance) defaultValue;
+            assertThat(value).isNotNull().isEqualTo(one.get("ON"));
+        }
+
+        Variable<?> o2 = model.getRegister("o2");
+        {
+            assertThat(o2).isNotNull();
+            assertThat(o2.getTypeDescriptor()).isInstanceOf(EnumerationType.class).isEqualTo(two);
+            Object defaultValue = o2.getDefaultValue();
+            assertThat(defaultValue).isNotNull().isInstanceOf(EnumerationType.Instance.class);
+            EnumerationType.Instance value = (EnumerationType.Instance) defaultValue;
+            assertThat(value).isNotNull().isEqualTo(two.get("OFF"));
+        }
+
+        assertThat(model.getRuleGroups().size()).isEqualTo(1);
+        RuleGroup ruleGroup = model.getRuleGroups().getFirst();
+        assertThat(ruleGroup).isNotNull();
+        assertThat(ruleGroup.getRules().size()).isEqualTo(2);
+
+        {
+            Rule rule = ruleGroup.getRules().get(0);
+            assertThat(rule).isNotNull().isInstanceOf(Assignation.class);
+            Assignation assignation = (Assignation) rule;
+            assertThat(assignation.getVariableName()).isEqualTo("o1");
+            assertThat(assignation.getExpression()).isNotNull().isInstanceOf(ReadValue.class);
+            ReadValue readValue = (ReadValue) assignation.getExpression();
+            assertThat(readValue.getIdentifier()).isEqualTo("One.OFF");
+        }
+
+        {
+            Rule rule = ruleGroup.getRules().get(1);
+            assertThat(rule).isNotNull().isInstanceOf(Assignation.class);
+            Assignation assignation = (Assignation) rule;
+            assertThat(assignation.getVariableName()).isEqualTo("o2");
+            assertThat(assignation.getExpression()).isNotNull().isInstanceOf(ReadValue.class);
+            ReadValue readValue = (ReadValue) assignation.getExpression();
+            assertThat(readValue.getIdentifier()).isEqualTo("Two.ON");
+        }
+
+        SimulationRunner simulationRunner = new SimulationRunner();
+        Simulation simulation = new Simulation(LocalDateTime.now(), Duration.ofSeconds(1));
+        simulation.registerDefaultModules();
+        String id = simulation.addEntity(model.createEntity("test"));
+        Session session = simulationRunner.startSimulation(simulation, 1);
+
+        session.get();
+        assertThat(session.getRemainingSteps()).isEqualTo(0);
+
+        EntityState state = simulation.getCurrentState(id);
+        assertThat(state).isNotNull();
+
+        assertThat(state.getValue("o1")).isNotNull().isInstanceOf(EnumerationType.Instance.class)
+                .isEqualTo(one.get("OFF"));
+
+        assertThat(state.getValue("o2")).isNotNull().isInstanceOf(EnumerationType.Instance.class)
+                .isEqualTo(two.get("ON"));
+    }
+
 }

@@ -210,7 +210,6 @@ public class Simulation {
         eventListeners.remove(listener);
     }
 
-
     public void dump() {
         System.out.println("Simulation time: " + time);
         for (Entity entity : entities.values()) {

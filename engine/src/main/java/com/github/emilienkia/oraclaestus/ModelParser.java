@@ -292,7 +292,7 @@ public class ModelParser {
         public void exitEnumTypeDeclaration(com.github.emilienkia.oraclaestus.grammars.ModelParser.EnumTypeDeclarationContext ctx) {
             Identifier enumName = Identifier.fromString(ctx.enum_name.getText());
 
-            EnumerationType type = new EnumerationType();
+            EnumerationType type = new EnumerationType(enumName);
             ctx.enum_value.stream().map(Token::getText).forEach(type::add);
             model.getEnumerations().add(type);
             this.type = type;
@@ -598,22 +598,22 @@ public class ModelParser {
 
         @Override
         public void exitIntegerType(com.github.emilienkia.oraclaestus.grammars.ModelParser.IntegerTypeContext ctx) {
-            type = new IntegerType();
+            type = IntegerType.get();
         }
 
         @Override
         public void exitFloatType(com.github.emilienkia.oraclaestus.grammars.ModelParser.FloatTypeContext ctx) {
-            type = new FloatType();
+            type = FloatType.get();
         }
 
         @Override
         public void exitStringType(com.github.emilienkia.oraclaestus.grammars.ModelParser.StringTypeContext ctx) {
-            type = new StringType();
+            type = StringType.get();
         }
 
         @Override
         public void exitBooleanType(com.github.emilienkia.oraclaestus.grammars.ModelParser.BooleanTypeContext ctx) {
-            type = new BooleanType();
+            type = BooleanType.get();
         }
 
         @Override

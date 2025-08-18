@@ -2,6 +2,15 @@ package com.github.emilienkia.oraclaestus.types;
 
 public class StringType implements TypeDescriptor<String> {
 
+    static final StringType INSTANCE = new StringType();
+
+    private StringType() {
+    }
+
+    public static StringType get() {
+        return INSTANCE;
+    }
+
     @Override
     public String cast(Object value) {
         switch(value) {

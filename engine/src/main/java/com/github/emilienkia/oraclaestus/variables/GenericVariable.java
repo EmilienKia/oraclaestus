@@ -9,9 +9,6 @@ public class GenericVariable extends Variable<Object> {
 
     TypeDescriptor<?> type;
 
-    public GenericVariable() {
-    }
-
     public GenericVariable(TypeDescriptor<?> type, Identifier name, Expression initialExpression) {
         super(name, initialExpression);
         this.type = type;
@@ -27,6 +24,7 @@ public class GenericVariable extends Variable<Object> {
         return type.getType();
     }
 
+    @Override
     public TypeDescriptor<Object> getTypeDescriptor() {
         return (TypeDescriptor<Object>)type;
     }

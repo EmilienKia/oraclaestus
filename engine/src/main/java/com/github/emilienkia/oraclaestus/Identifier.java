@@ -33,6 +33,14 @@ public class Identifier implements Comparable<Identifier> {
         // TODO add check content validity
     }
 
+    public int getLength() {
+        return path.size();
+    }
+
+    public boolean isSimple() {
+        return path.size() == 1;
+    }
+
     public String getLast() {
         if (path.isEmpty()) {
             return null;

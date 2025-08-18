@@ -15,28 +15,28 @@ public class Helper {
 
     static public TypeDescriptor<?> toTypeDescriptor(Class<?> clazz) {
         if (clazz == Integer.class || clazz == int.class || clazz == Long.class || clazz == long.class) {
-            return new IntegerType();
+            return IntegerType.get();
         } else if (clazz == Float.class || clazz == float.class || clazz == Double.class || clazz == double.class) {
-            return new FloatType();
+            return FloatType.get();
         } else if (clazz == Number.class) {
             return new NumberType<>();
         } else if (clazz == String.class) {
-            return new StringType();
+            return StringType.get();
         } else if (clazz == Boolean.class || clazz == boolean.class) {
-            return new BooleanType();
+            return BooleanType.get();
         }
         throw new IllegalArgumentException("Unsupported type: " + clazz.getName());
     }
 
     static public TypeDescriptor<?> toTypeDescriptorStrict(Class<?> clazz) {
         if (clazz == Integer.class || clazz == int.class) {
-            return new IntegerType();
+            return IntegerType.get();
         } else if (clazz == Float.class || clazz == float.class) {
-            return new FloatType();
+            return FloatType.get();
         } else if (clazz == String.class) {
-            return new StringType();
+            return StringType.get();
         } else if (clazz == Boolean.class || clazz == boolean.class) {
-            return new BooleanType();
+            return BooleanType.get();
         }
         throw new IllegalArgumentException("Unsupported type: " + clazz.getName());
     }

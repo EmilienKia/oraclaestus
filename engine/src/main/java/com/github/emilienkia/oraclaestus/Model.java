@@ -4,6 +4,7 @@ import com.github.emilienkia.oraclaestus.expressions.Expression;
 import com.github.emilienkia.oraclaestus.functions.Function;
 import com.github.emilienkia.oraclaestus.rules.RuleGroup;
 import com.github.emilienkia.oraclaestus.types.CustomType;
+import com.github.emilienkia.oraclaestus.types.EnumerableType;
 import com.github.emilienkia.oraclaestus.types.EnumerationType;
 import com.github.emilienkia.oraclaestus.variables.Variable;
 import lombok.*;
@@ -73,14 +74,31 @@ public class Model {
         return functions.get(name);
     }
 
+    public EnumerationType getEnumeration(String name) {
+        return enumerations.stream().filter(e -> e.getEnumTypeName().equals(name))
+                .findFirst()
+                .orElse(null);
+    }
+
     public EnumerationType.Instance getEnumerationValue(Identifier name) {
-        for (EnumerationType enumeration : enumerations) {
-            Integer value = enumeration.getValue(name);
-            if (value != null) {
-                return enumeration.cast(value);
+        if(name.isSimple()) {
+            // Simple identifier (only one part), iterate over all enumerations to find the first good one.
+            for (EnumerationType enumeration : enumerations) {
+                EnumerationType.Instance instance = enumeration.get(name);
+                if (instance != null) {
+                    return instance;
+                }
             }
+            return null;
+        } else {
+            List<String> path = name.getPath();
+            String valueName = path.removeLast();
+            Identifier enumName = new Identifier(path);
+            return enumerations.stream().filter(e -> e.getEnumTypeName().equals(enumName))
+                    .findFirst()
+                    .map(enumeration -> enumeration.get(valueName))
+                    .orElse(null);
         }
-        return null;
     }
 
     public void dump() {

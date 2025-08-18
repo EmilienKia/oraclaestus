@@ -9,9 +9,6 @@ import lombok.Data;
 @Data
 public class StringVariable extends Variable<String> {
 
-    public StringVariable() {
-    }
-
     public StringVariable(String name, String defaultValue) {
         super(Identifier.fromString(name), defaultValue);
     }
@@ -26,7 +23,7 @@ public class StringVariable extends Variable<String> {
     }
 
     public TypeDescriptor<String> getTypeDescriptor() {
-        return new StringType();
+        return StringType.get();
     }
 
 }

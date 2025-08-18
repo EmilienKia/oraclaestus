@@ -7,9 +7,6 @@ import com.github.emilienkia.oraclaestus.types.TypeDescriptor;
 
 public class BooleanVariable extends Variable<Boolean> {
 
-    public BooleanVariable() {
-    }
-
     public BooleanVariable(String name, Boolean defaultValue) {
         super(Identifier.fromString(name), defaultValue);
     }
@@ -24,6 +21,6 @@ public class BooleanVariable extends Variable<Boolean> {
     }
 
     public TypeDescriptor<Boolean> getTypeDescriptor() {
-        return new BooleanType();
+        return BooleanType.get();
     }
 }

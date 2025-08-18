@@ -2,6 +2,15 @@ package com.github.emilienkia.oraclaestus.types;
 
 public class IntegerType extends NumberType<Integer> {
 
+    static final IntegerType INSTANCE = new IntegerType();
+
+    private IntegerType() {
+    }
+
+    public static IntegerType get() {
+        return INSTANCE;
+    }
+
     @Override
     public Integer cast(Object value) {
         switch(value) {

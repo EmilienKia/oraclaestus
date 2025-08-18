@@ -30,7 +30,7 @@ public abstract class Function {
 
     public Function(Identifier name, TypeDescriptor<?> returnType, List<Variable<?>> parameters, boolean isVarArgs) {
         this.name = name;
-        this.returnType = returnType != null ? returnType : new VoidType();
+        this.returnType = returnType != null ? returnType : VoidType.get();
         if (parameters != null) {
             this.parameters.addAll(parameters);
         }
